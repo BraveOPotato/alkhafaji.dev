@@ -4,1160 +4,480 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Abdullah Al Khafaji</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; overflow:hidden; background:#000; }
-body { font-family:'JetBrains Mono',monospace; cursor:none; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050810;overflow:hidden;font-family:system-ui,sans-serif;color:#fff}
+canvas{display:block;position:fixed;inset:0;z-index:0}
 
-#c { position:fixed; inset:0; z-index:0; }
+#intro{position:fixed;inset:0;background:#050810;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10}
+#intro.out{opacity:0;pointer-events:none;transition:opacity 1s}
+.i-tag{font-size:11px;letter-spacing:.3em;color:#e84000;text-transform:uppercase;margin-bottom:22px}
+.i-name{font-size:clamp(52px,9vw,120px);line-height:.88;color:#fff;text-align:center;font-weight:900}
+.i-name span{color:#e84000}
+.i-sub{font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.14em;text-transform:uppercase;margin-top:20px}
+#enterBtn{margin-top:52px;font-size:12px;letter-spacing:.22em;padding:14px 42px;background:transparent;border:2px solid #e84000;color:#e84000;cursor:pointer;text-transform:uppercase;transition:background .3s,color .3s}
+#enterBtn:hover{background:#e84000;color:#000}
 
-/* Custom cursor */
-#cur { position:fixed; width:8px; height:8px; border-radius:50%; background:#3dd68c;
-  pointer-events:none; z-index:9999; transform:translate(-50%,-50%);
-  box-shadow:0 0 12px #3dd68c, 0 0 24px rgba(61,214,140,.4); transition:width .2s,height .2s; }
-#cur-trail { position:fixed; width:28px; height:28px; border:1px solid rgba(61,214,140,.4);
-  border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); }
+#loading{position:fixed;inset:0;background:#050810;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9;font-size:11px;letter-spacing:.2em;color:#e84000;text-transform:uppercase}
 
+#hud{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);display:flex;gap:40px;align-items:center;opacity:0;transition:opacity .8s;pointer-events:none;z-index:5}
+#hud.on{opacity:1}
+.nk{width:30px;height:30px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.4);background:rgba(0,0,0,.5)}
+.hh{font-size:9px;color:rgba(255,255,255,.22);letter-spacing:.12em;text-align:center;line-height:1.6;text-transform:uppercase}
 
+#clabel{position:fixed;top:32px;left:50%;transform:translateX(-50%);text-align:center;opacity:0;transition:opacity .5s;pointer-events:none;z-index:5}
+#clabel.on{opacity:1}
+.cl-num{font-size:9px;letter-spacing:.28em;color:#e84000;opacity:.7}
+.cl-name{font-size:clamp(18px,3vw,40px);color:#fff;letter-spacing:.07em;margin-top:3px;font-weight:700}
+.cl-tags{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.cl-tag{font-size:8px;padding:3px 8px;border:1px solid rgba(232,64,0,.3);color:rgba(255,110,50,.85);letter-spacing:.09em}
 
-/* HUD nav */
-#hud-nav {
-  position:fixed; top:0; left:0; right:0; z-index:100;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:20px 40px; pointer-events:none;
-}
-.hud-logo {
-  font-family:'Orbitron',monospace; font-size:.85rem; font-weight:900;
-  color:#3dd68c; letter-spacing:3px; text-shadow:0 0 20px rgba(61,214,140,.5);
-  pointer-events:all;
-}
-.hud-links { display:flex; gap:4px; pointer-events:all; }
-.hud-link {
-  padding:6px 16px; border:1px solid rgba(61,214,140,.2); background:rgba(0,0,0,.4);
-  backdrop-filter:blur(8px); color:rgba(61,214,140,.6); font-size:.7rem;
-  letter-spacing:2px; cursor:none; transition:all .25s; text-transform:uppercase;
-  font-family:'JetBrains Mono',monospace;
-}
-.hud-link:hover { color:#3dd68c; border-color:rgba(61,214,140,.6); background:rgba(61,214,140,.08); }
+#spanel{position:fixed;top:50%;right:40px;transform:translateY(-50%) translateX(16px);max-width:240px;opacity:0;transition:opacity .4s,transform .4s;pointer-events:none;z-index:5}
+#spanel.on{opacity:1;transform:translateY(-50%) translateX(0)}
+.sp-bar{border-left:2px solid #e84000;padding-left:16px}
+.sp-sub{font-size:9px;color:#e84000;letter-spacing:.18em;opacity:.7;margin-bottom:7px}
+.sp-title{font-size:26px;color:#fff;line-height:1;letter-spacing:.05em;margin-bottom:9px;font-weight:700}
+.sp-desc{font-size:12px;line-height:1.75;color:rgba(255,255,255,.5);margin-bottom:12px}
+.sp-tags{display:flex;flex-wrap:wrap;gap:5px}
+.sp-tag{font-size:8px;padding:3px 7px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);letter-spacing:.06em}
 
-/* Bottom HUD */
-#hud-bottom {
-  position:fixed; bottom:0; left:0; right:0; z-index:100;
-  display:flex; justify-content:space-between; align-items:flex-end;
-  padding:20px 40px; pointer-events:none;
-}
-.hud-scroll-hint {
-  font-size:.65rem; color:rgba(61,214,140,.4); letter-spacing:3px;
-  text-transform:uppercase; display:flex; flex-direction:column; align-items:center; gap:8px;
-  animation:floatY 2s ease-in-out infinite;
-}
-.scroll-line { width:1px; height:32px; background:linear-gradient(180deg,#3dd68c,transparent); }
-@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
-.hud-coords { font-size:.62rem; color:rgba(61,214,140,.3); letter-spacing:1px; text-align:right; }
+#corner{position:fixed;top:30px;left:34px;opacity:0;transition:opacity .8s;pointer-events:none;z-index:5}
+#corner.on{opacity:1}
+.co-n{font-size:19px;color:#fff;letter-spacing:.1em;font-weight:700}
+.co-t{font-size:8px;color:rgba(232,64,0,.7);letter-spacing:.18em;margin-top:3px}
 
-/* Progress bar */
-#progress { position:fixed; top:0; left:0; height:1px; background:linear-gradient(90deg,#3dd68c,#00c8e0);
-  z-index:200; transition:width .1s; box-shadow:0 0 8px #3dd68c; }
+#dots{position:fixed;top:50%;right:22px;transform:translateY(-50%);display:flex;flex-direction:column;gap:9px;opacity:0;transition:opacity .8s;pointer-events:none;z-index:5}
+#dots.on{opacity:1}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.12);transition:all .3s}
+.dot.on{background:#e84000;box-shadow:0 0 7px #e84000;transform:scale(1.5)}
 
-/* Section panels — positioned by JS */
-.panel {
-  position:fixed; z-index:50; pointer-events:none;
-  opacity:0; transition:opacity .6s;
-}
-.panel.visible { opacity:1; pointer-events:all; }
+#approach{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#00ffcc;text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;z-index:5}
+#approach.on{opacity:1}
 
-.panel-inner {
-  background:rgba(6,14,10,.82); border:1px solid rgba(61,214,140,.18);
-  backdrop-filter:blur(16px); padding:40px 44px;
-  box-shadow:0 0 60px rgba(0,0,0,.6), inset 0 0 40px rgba(61,214,140,.02);
-  position:relative; overflow:hidden;
-  max-height:85vh;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(61,214,140,.3) transparent;
-}
-.panel-inner::before {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg, rgba(61,214,140,.04) 0%, transparent 60%);
-  pointer-events:none;
-}
-.panel-inner::after {
-  content:''; position:absolute; top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg,transparent,rgba(61,214,140,.5),transparent);
-}
+#term-ov{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+#term-ov.on{opacity:1;pointer-events:all}
+#terminal{width:min(620px,90vw);border:1px solid rgba(0,255,200,.25);background:#020d0a}
+.t-bar{background:rgba(0,255,180,.05);border-bottom:1px solid rgba(0,255,180,.12);padding:9px 16px;display:flex;align-items:center;gap:8px}
+.t-dot{width:8px;height:8px;border-radius:50%}
+.t-btitle{font-size:9px;color:rgba(0,255,180,.35);letter-spacing:.15em;margin-left:6px}
+.t-x{font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.15em;cursor:pointer;margin-left:auto;background:none;border:none;padding:3px 6px;text-transform:uppercase;transition:color .2s;color:rgba(255,255,255,.3)}
+.t-x:hover{color:rgba(255,255,255,.8)}
+.t-body{padding:22px 26px 26px}
+.t-boot{font-size:10px;color:rgba(0,255,180,.45);letter-spacing:.06em;line-height:1.7;margin-bottom:20px;font-family:monospace}
+.t-boot span{color:#00ffcc}
+.t-lbl{font-size:9px;color:rgba(0,255,180,.4);letter-spacing:.12em;margin-bottom:5px;font-family:monospace}
+.t-row{display:flex;align-items:center;gap:7px;margin-bottom:16px}
+.t-chev{font-size:12px;color:#00ffcc;font-family:monospace}
+.t-in{flex:1;background:transparent;border:none;border-bottom:1px solid rgba(0,255,180,.2);color:#00ffcc;font-family:monospace;font-size:12px;padding:5px 2px;outline:none;letter-spacing:.04em;caret-color:#00ffcc}
+.t-in::placeholder{color:rgba(0,255,180,.18)}
+.t-in:focus{border-bottom-color:rgba(0,255,180,.6)}
+.t-ta{width:100%;background:transparent;border:1px solid rgba(0,255,180,.12);color:#00ffcc;font-family:monospace;font-size:11px;padding:9px 11px;outline:none;resize:none;line-height:1.7;caret-color:#00ffcc;margin-top:5px;margin-bottom:20px}
+.t-ta::placeholder{color:rgba(0,255,180,.18)}
+.t-ta:focus{border-color:rgba(0,255,180,.45)}
+.t-foot{display:flex;align-items:center;justify-content:space-between}
+.t-send{font-family:monospace;font-size:11px;letter-spacing:.2em;padding:10px 28px;background:transparent;border:1px solid rgba(0,255,180,.45);color:#00ffcc;cursor:pointer;text-transform:uppercase;transition:background .25s,color .25s}
+.t-send:hover{background:#00ffcc;color:#000}
+.t-enc{font-size:9px;color:rgba(0,255,180,.2);letter-spacing:.1em}
+.t-status{font-family:monospace;font-size:10px;letter-spacing:.1em;color:rgba(0,255,180,.4);min-height:16px;margin-top:12px}
+.t-status.err{color:rgba(255,80,60,.85)}
+.t-status.ok{color:#00ffcc}
 
-.p-tag { font-size:.65rem; color:rgba(61,214,140,.5); letter-spacing:4px; text-transform:uppercase; margin-bottom:12px; }
-.p-name { font-family:'Orbitron',monospace; font-size:clamp(2rem,5vw,4rem); font-weight:900;
-  color:#e6edf3; line-height:1.05; margin-bottom:8px; }
-.p-name em { color:#3dd68c; font-style:normal; display:block; font-size:.6em; }
-.p-sub { font-size:.82rem; color:rgba(171,178,191,.6); line-height:1.9; max-width:480px; margin-bottom:28px; font-style:italic; }
-.p-tags { display:flex; flex-wrap:wrap; gap:8px; }
-.ptag { padding:4px 12px; border:1px solid rgba(61,214,140,.2); font-size:.65rem;
-  color:rgba(61,214,140,.7); letter-spacing:1px; background:rgba(61,214,140,.04); }
-.ptag.red { border-color:rgba(224,108,117,.3); color:rgba(224,108,117,.8); background:rgba(224,108,117,.04); }
-.ptag.blue { border-color:rgba(97,175,239,.3); color:rgba(97,175,239,.8); background:rgba(97,175,239,.04); }
-
-/* Skill cards inside panel */
-.skill-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:8px; }
-.sk { border:1px solid rgba(61,214,140,.12); padding:18px 16px; background:rgba(0,0,0,.3); position:relative; overflow:hidden; }
-.sk::before { content:''; position:absolute; top:0; left:0; width:2px; height:100%; background:var(--acc); }
-.sk-num { font-family:'Orbitron',monospace; font-size:1.8rem; color:rgba(255,255,255,.04); font-weight:900;
-  position:absolute; bottom:8px; right:12px; }
-.sk-icon { font-size:1.4rem; margin-bottom:10px; }
-.sk-title { font-size:.72rem; font-weight:700; color:#dce4ec; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
-.sk-desc { font-size:.67rem; color:rgba(171,178,191,.5); line-height:1.7; }
-.sk-tags { margin-top:10px; display:flex; flex-wrap:wrap; gap:4px; }
-.sk-tag { font-size:.58rem; padding:1px 7px; border:1px solid rgba(255,255,255,.08); color:rgba(171,178,191,.45); }
-
-/* Snippet panel */
-.code-block { background:#0d1117; border:1px solid rgba(255,255,255,.07); border-radius:4px; overflow:hidden; margin-top:16px; }
-.code-bar { background:#161b22; padding:8px 16px; display:flex; gap:6px; align-items:center; border-bottom:1px solid rgba(255,255,255,.05); }
-.cd { width:10px; height:10px; border-radius:50%; }
-.code-pre { padding:16px 20px; font-size:.72rem; line-height:1.7; overflow:auto; max-height:200px; }
-.kw{color:#c678dd;} .fn-n{color:#61afef;} .ty{color:#e5c07b;} .st{color:#98c379;}
-.cm{color:#5c6370;font-style:italic;} .num{color:#d19a66;} .mac{color:#56b6c2;} .attr{color:#e06c75;}
-
-/* Linux panel specifics */
-.nf-grid { display:grid; grid-template-columns:auto 1fr; gap:24px; }
-.nf-art pre { font-size:.58rem; line-height:1.35; color:#e06c75; white-space:pre; }
-.nf-info { font-size:.72rem; line-height:2.1; }
-.nf-k { color:#3dd68c; font-weight:700; display:inline-block; min-width:100px; }
-.nf-v { color:#abb2bf; }
-.distros { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:20px; }
-.distro { border:1px solid rgba(61,214,140,.12); padding:12px 10px; text-align:center; }
-.distro-n { font-size:.65rem; color:#abb2bf; margin-top:4px; }
-.distro-l { font-size:.58rem; color:rgba(61,214,140,.5); }
-
-/* RHEL panel */
-.rhel-cols { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:16px; }
-.rcol h4 { font-size:.65rem; color:#e06c75; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; font-family:'Orbitron',monospace; }
-.rcol ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
-.rcol li { font-size:.67rem; color:rgba(171,178,191,.5); line-height:1.5; display:flex; gap:6px; }
-.rcol li::before { content:'▸'; color:rgba(224,108,117,.5); flex-shrink:0; font-size:.55rem; margin-top:3px; }
-
-/* OSS projects */
-.oss-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px; }
-.oss-proj { border:1px solid rgba(61,214,140,.1); padding:14px 16px; }
-.oss-name { font-size:.75rem; color:#00c8e0; margin-bottom:4px; }
-.oss-desc { font-size:.63rem; color:rgba(171,178,191,.45); line-height:1.6; }
-.oss-lang { font-size:.58rem; color:rgba(61,214,140,.5); margin-top:8px; display:flex; gap:6px; align-items:center; }
-.ldot { width:8px; height:8px; border-radius:50%; }
-
-/* Contact */
-.contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
-.contact-item { border:1px solid rgba(61,214,140,.12); padding:20px; }
-.contact-k { font-size:.6rem; color:rgba(61,214,140,.4); letter-spacing:3px; text-transform:uppercase; margin-bottom:6px; }
-.contact-v { font-size:.82rem; color:#dce4ec; }
-.contact-v a { color:#00c8e0; text-decoration:none; }
-.status-pill { display:inline-flex; align-items:center; gap:8px; padding:8px 16px;
-  border:1px solid rgba(61,214,140,.3); background:rgba(61,214,140,.06); color:#3dd68c; font-size:.75rem; margin-top:16px; }
-.spulse { width:8px; height:8px; border-radius:50%; background:#3dd68c; animation:p 2s infinite; }
-@keyframes p { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,214,140,.4)} 50%{opacity:.5} 70%{box-shadow:0 0 0 8px transparent} }
+#flash{position:fixed;inset:0;background:#00ffcc;opacity:0;pointer-events:none;z-index:30;transition:opacity .15s}
 </style>
 </head>
 <body>
 
-<div id="cur"></div>
-<div id="cur-trail"></div>
-<div id="progress"></div>
-
 <canvas id="c"></canvas>
 
-
-
-<!-- HUD -->
-<nav id="hud-nav">
-  <div class="hud-logo">ALKHAFAJI.DEV</div>
-  <div class="hud-links">
-    <div class="hud-link" data-section="0">Home</div>
-    <div class="hud-link" data-section="1">Skills</div>
-    <div class="hud-link" data-section="2">Linux</div>
-    <div class="hud-link" data-section="3">RHEL</div>
-    <div class="hud-link" data-section="4">Contact</div>
-  </div>
-</nav>
-
-<div id="hud-bottom">
-  <div class="hud-scroll-hint">
-    <div class="scroll-line"></div>
-    Scroll
-  </div>
-  <div class="hud-coords" id="hud-coords">CAM X:0.00 Y:0.00 Z:0.00</div>
+<div id="intro">
+  <div class="i-tag">Systems Architect &middot; Protocol Engineer</div>
+  <div class="i-name">Abdullah<br><span>Al Khafaji</span></div>
+  <div class="i-sub">Rust &middot; C/C++ &middot; WASM &middot; Electronics &middot; DevOps</div>
+  <button id="enterBtn">Enter the Bunker</button>
 </div>
 
-<!-- Content panels (positioned/shown by JS) -->
-<div class="panel" id="panel-hero">
-  <div class="panel-inner">
-    <div class="p-tag">// root@dev.local ~ systems architect</div>
-    <div class="p-name"><em>Hello, world.</em>Abdullah<br>Al Khafaji</div>
-    <p class="p-sub">
-      I build software closest to the metal — protocols, compilers, embedded firmware, and the infrastructure that runs it all. A Linux advocate who believes the kernel is humanity's greatest engineering achievement.
-    </p>
-    <div class="p-tags">
-      <span class="ptag">Rust</span>
-      <span class="ptag">C / C++</span>
-      <span class="ptag">WebAssembly</span>
-      <span class="ptag red">Linux · Open Source</span>
-      <span class="ptag blue">Kubernetes · RKE2</span>
-      <span class="ptag">Reverse Engineering</span>
-      <span class="ptag">Electronics</span>
+<div id="loading"><div id="loadTxt">Initializing bunker...</div></div>
+
+<div id="corner"><div class="co-n">Abdullah Al Khafaji</div><div class="co-t">// Systems Architect</div></div>
+<div id="clabel"><div class="cl-num" id="cnum"></div><div class="cl-name" id="cname"></div><div class="cl-tags" id="ctags"></div></div>
+<div id="spanel"><div class="sp-bar"><div class="sp-sub" id="ssub"></div><div class="sp-title" id="stitle"></div><div class="sp-desc" id="sdesc"></div><div class="sp-tags" id="stagsl"></div></div></div>
+<div id="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+<div id="hud">
+  <div>
+    <div style="display:flex;justify-content:center;margin-bottom:4px"><div class="nk">W</div></div>
+    <div style="display:flex;gap:4px"><div class="nk">A</div><div class="nk">S</div><div class="nk">D</div></div>
+  </div>
+  <div class="hh">Walk the<br>bunker</div>
+</div>
+<div id="approach">[ Press E &mdash; Open Terminal ]</div>
+<div id="flash"></div>
+
+<div id="term-ov">
+  <div id="terminal">
+    <div class="t-bar">
+      <div class="t-dot" style="background:#ff5f57"></div>
+      <div class="t-dot" style="background:#febc2e"></div>
+      <div class="t-dot" style="background:#28c840"></div>
+      <span class="t-btitle">SECURE_CHANNEL &mdash; ENCRYPTED</span>
+      <button class="t-x" id="tClose">ESC</button>
     </div>
-  </div>
-</div>
-
-<div class="panel" id="panel-skills">
-  <div class="panel-inner">
-    <div class="p-tag">// skill_matrix.rs</div>
-    <div class="p-name" style="font-size:1.8rem;margin-bottom:20px">Capabilities</div>
-    <div class="skill-row">
-      <div class="sk" style="--acc:#e06c75">
-        <span class="sk-num">01</span>
-        <div class="sk-icon">⚙️</div>
-        <div class="sk-title">Protocol Engineering</div>
-        <div class="sk-desc">Zero-copy binary parsers, memory-safe FFI, async I/O with Tokio. Correctness and speed as one.</div>
-        <div class="sk-tags"><span class="sk-tag">Rust</span><span class="sk-tag">C</span><span class="sk-tag">tokio</span><span class="sk-tag">nom</span></div>
+    <div class="t-body">
+      <div class="t-boot">&gt; LINK ESTABLISHED<br>&gt; NODE: <span>BUNKER-07 / AES-256</span><br>&gt; Awaiting operator input...</div>
+      <div class="t-lbl">&gt; IDENTIFY &mdash; your name</div>
+      <div class="t-row"><span class="t-chev">&gt;_</span><input class="t-in" id="tName" type="text" placeholder="Full name" autocomplete="off"></div>
+      <div class="t-lbl">&gt; REPLY-TO &mdash; your email</div>
+      <div class="t-row"><span class="t-chev">&gt;_</span><input class="t-in" id="tEmail" type="email" placeholder="you@domain.com" autocomplete="off"></div>
+      <div class="t-lbl">&gt; PAYLOAD &mdash; your message</div>
+      <textarea class="t-ta" id="tMsg" rows="5" placeholder="Describe the mission..."></textarea>
+      <div class="t-foot">
+        <button class="t-send" id="tSend">[ TRANSMIT ]</button>
+        <span class="t-enc">AES-256 &middot; TLS 1.3</span>
       </div>
-      <div class="sk" style="--acc:#61afef">
-        <span class="sk-num">02</span>
-        <div class="sk-icon">🌐</div>
-        <div class="sk-title">WebAssembly</div>
-        <div class="sk-desc">Compiling Rust to Wasm. Native speed in the browser — no GC pauses, no apologies.</div>
-        <div class="sk-tags"><span class="sk-tag">wasm-bindgen</span><span class="sk-tag">WASI</span><span class="sk-tag">wasm-pack</span></div>
-      </div>
-      <div class="sk" style="--acc:#c678dd">
-        <span class="sk-num">03</span>
-        <div class="sk-icon">🔬</div>
-        <div class="sk-title">Reverse Engineering</div>
-        <div class="sk-desc">Binary analysis, protocol dissection, firmware unpacking. Nothing stays a black box.</div>
-        <div class="sk-tags"><span class="sk-tag">Ghidra</span><span class="sk-tag">GDB</span><span class="sk-tag">frida</span></div>
-      </div>
-      <div class="sk" style="--acc:#e5c07b">
-        <span class="sk-num">04</span>
-        <div class="sk-icon">🔌</div>
-        <div class="sk-title">Electronics</div>
-        <div class="sk-desc">PCB design, embedded firmware, debugging at the oscilloscope level. SPI/I²C/JTAG.</div>
-        <div class="sk-tags"><span class="sk-tag">Embedded C</span><span class="sk-tag">PCB</span><span class="sk-tag">JTAG</span></div>
-      </div>
-      <div class="sk" style="--acc:#3dd68c; grid-column:span 2">
-        <span class="sk-num">05</span>
-        <div class="sk-icon">🖧</div>
-        <div class="sk-title">Systems & DevOps</div>
-        <div class="sk-desc">Building the platforms others deploy on — from bare-metal RHEL to full Kubernetes clusters with observability.</div>
-        <div class="sk-tags"><span class="sk-tag">Kubernetes</span><span class="sk-tag">RKE2</span><span class="sk-tag">Rancher</span><span class="sk-tag">OpenShift</span><span class="sk-tag">RHEL</span><span class="sk-tag">oVirt</span><span class="sk-tag">Helm</span></div>
-      </div>
+      <div class="t-status" id="tStatus"></div>
     </div>
   </div>
 </div>
 
-<div class="panel" id="panel-linux">
-  <div class="panel-inner">
-    <div class="p-tag">// uname -a && philosophy</div>
-    <div class="p-name" style="font-size:1.8rem;margin-bottom:20px">Linux &amp; Open Source</div>
-    <div class="nf-grid">
-      <div class="nf-art">
-<pre>    ____
-   /  __\
-  /  /
- /  /___
-/  ____/
-\  \
- \  \___
-  \  __/
-   \____\ </pre>
-      </div>
-      <div class="nf-info">
-        <div><span class="nf-k">OS</span><span class="nf-v">RHEL 9.4 x86_64</span></div>
-        <div><span class="nf-k">Kernel</span><span class="nf-v">6.8.9-300.el9.x86_64</span></div>
-        <div><span class="nf-k">Shell</span><span class="nf-v">bash 5.1.8 + tmux</span></div>
-        <div><span class="nf-k">Editor</span><span class="nf-v">Neovim 0.10</span></div>
-        <div><span class="nf-k">Uptime</span><span class="nf-v">847 days, 3 hrs</span></div>
-        <div><span class="nf-k">Packages</span><span class="nf-v">2,847 (rpm)</span></div>
-        <div><span class="nf-k">Philosophy</span><span class="nf-v">Free as in freedom</span></div>
-      </div>
-    </div>
-    <div class="distros">
-      <div class="distro"><div style="font-size:1.4rem">🎩</div><div class="distro-n">RHEL / CentOS</div><div class="distro-l" style="color:#e06c75">Expert</div></div>
-      <div class="distro"><div style="font-size:1.4rem">🟠</div><div class="distro-n">Ubuntu Server</div><div class="distro-l">Expert</div></div>
-      <div class="distro"><div style="font-size:1.4rem">🏗️</div><div class="distro-n">Arch Linux</div><div class="distro-l">Advanced</div></div>
-      <div class="distro"><div style="font-size:1.4rem">🐧</div><div class="distro-n">Alpine Linux</div><div class="distro-l">Expert</div></div>
-      <div class="distro"><div style="font-size:1.4rem">🔵</div><div class="distro-n">Fedora CoreOS</div><div class="distro-l">Proficient</div></div>
-      <div class="distro"><div style="font-size:1.4rem">🟣</div><div class="distro-n">Debian Stable</div><div class="distro-l">Proficient</div></div>
-    </div>
-    <div class="oss-grid">
-      <div class="oss-proj"><div class="oss-name">rust-proto-core</div><div class="oss-desc">Zero-copy binary protocol framework with derive macros</div><div class="oss-lang"><div class="ldot" style="background:#e06c75"></div>Rust · 1.2k ★</div></div>
-      <div class="oss-proj"><div class="oss-name">rhel-ansible-hardening</div><div class="oss-desc">CIS Level 2 + STIG hardening collection for RHEL 8/9</div><div class="oss-lang"><div class="ldot" style="background:#e5c07b"></div>Ansible · 634 ★</div></div>
-      <div class="oss-proj"><div class="oss-name">wasm-serde-bridge</div><div class="oss-desc">Rust↔JS type marshalling for wasm-bindgen without overhead</div><div class="oss-lang"><div class="ldot" style="background:#e06c75"></div>Rust · 847 ★</div></div>
-      <div class="oss-proj"><div class="oss-name">k8s-ebpf-tracer</div><div class="oss-desc">eBPF-based syscall tracer emitting OpenTelemetry spans</div><div class="oss-lang"><div class="ldot" style="background:#61afef"></div>C/eBPF · 411 ★</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="panel-rhel">
-  <div class="panel-inner">
-    <div class="p-tag" style="color:rgba(224,108,117,.6)">// red hat enterprise linux · production experience</div>
-    <div class="p-name" style="font-size:1.8rem;margin-bottom:4px;color:#e06c75">⬡ RHEL Deep Dive</div>
-    <div style="font-size:.68rem;color:rgba(224,108,117,.4);letter-spacing:2px;margin-bottom:16px">RHEL 7 · 8 · 9 · FIPS · SELinux · Satellite</div>
-    <div class="code-block">
-      <div class="code-bar"><div class="cd" style="background:#ff5f57"></div><div class="cd" style="background:#febc2e"></div><div class="cd" style="background:#28c840"></div><span style="margin-left:8px;font-size:.6rem;color:#8b949e">hardening.yml</span></div>
-      <div class="code-pre"><pre><span class="cm"># CIS Level 2 + STIG — Ansible task excerpt</span>
-<span class="fn-n">- name</span>: <span class="st">Enforce FIPS 140-2 mode</span>
-  <span class="fn-n">command</span>: fips-mode-setup --enable
-  <span class="fn-n">when</span>: <span class="st">not fips_enabled.stdout | bool</span>
-
-<span class="fn-n">- name</span>: <span class="st">Author SELinux policy module</span>
-  <span class="fn-n">community.general.selinux_permissive</span>:
-    <span class="fn-n">name</span>: podman_rootless
-    <span class="fn-n">permissive</span>: <span class="kw">false</span>
-
-<span class="fn-n">- name</span>: <span class="st">Lock down SSH</span>
-  <span class="fn-n">lineinfile</span>: { path: /etc/ssh/sshd_config,
-    regexp: <span class="st">'^PermitRootLogin'</span>,
-    line: <span class="st">'PermitRootLogin no'</span> }</pre></div>
-    </div>
-    <div class="rhel-cols">
-      <div class="rcol">
-        <h4>Sys Admin</h4>
-        <ul>
-          <li>Kickstart &amp; PXE automated provisioning</li>
-          <li>SELinux custom policy authoring</li>
-          <li>systemd unit &amp; socket activation</li>
-          <li>RPM spec writing &amp; internal repos</li>
-          <li>LUKS + TPM2 auto-unlock at boot</li>
-        </ul>
-      </div>
-      <div class="rcol">
-        <h4>Security</h4>
-        <ul>
-          <li>FIPS 140-2 compliance configuration</li>
-          <li>firewalld + nftables rule authoring</li>
-          <li>auditd policy &amp; log management</li>
-          <li>Vault CA for SSH certificate auth</li>
-          <li>CIS Benchmark via STIG Ansible</li>
-        </ul>
-      </div>
-      <div class="rcol">
-        <h4>Platform</h4>
-        <ul>
-          <li>Podman rootless container pods</li>
-          <li>OpenShift 4.x on RHEL CoreOS</li>
-          <li>Image Builder for custom base images</li>
-          <li>Satellite Server patch lifecycle</li>
-          <li>Red Hat Insights CVE &amp; drift</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="panel-contact">
-  <div class="panel-inner">
-    <div class="p-tag">// ssh contact@khafaji.dev</div>
-    <div class="p-name" style="font-size:2rem;margin-bottom:16px">Get In Touch</div>
-    <p class="p-sub">Open to systems engineering, infrastructure, low-level, and embedded roles.</p>
-    <div class="contact-grid">
-      <div class="contact-item"><div class="contact-k">Email</div><div class="contact-v"><a href="mailto:abdullah@khafaji.dev">abdullah@khafaji.dev</a></div></div>
-      <div class="contact-item"><div class="contact-k">GitHub</div><div class="contact-v"><a href="#">github.com/alkhafaji</a></div></div>
-      <div class="contact-item"><div class="contact-k">LinkedIn</div><div class="contact-v"><a href="#">/in/alkhafaji</a></div></div>
-      <div class="contact-item"><div class="contact-k">Location</div><div class="contact-v">Available Remote / On-site</div></div>
-    </div>
-    <div class="status-pill"><div class="spulse"></div> AVAILABLE FOR WORK</div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════
-// CURSOR
-// ═══════════════════════════════════════════════════════════
-const cur = document.getElementById('cur');
-const curTrail = document.getElementById('cur-trail');
-let mx=innerWidth/2, my=innerHeight/2, tx=mx, ty=my;
-document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-(function animCur(){
-  tx += (mx-tx)*.15; ty += (my-ty)*.15;
-  cur.style.left=mx+'px'; cur.style.top=my+'px';
-  curTrail.style.left=tx+'px'; curTrail.style.top=ty+'px';
-  requestAnimationFrame(animCur);
-})();
-
-// ═══════════════════════════════════════════════════════════
-// THREE.JS SETUP
-// ═══════════════════════════════════════════════════════════
-const canvas = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
-renderer.setClearColor(0x000000);
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.01, 1000);
-camera.position.set(0, 0, 5);
-
-window.addEventListener('resize', () => {
-  renderer.setSize(innerWidth, innerHeight);
-  camera.aspect = innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  bgMesh.material.uniforms.uRes.value.set(innerWidth, innerHeight);
-  postMesh.material.uniforms.uRes.value.set(innerWidth, innerHeight);
+// ── Button wired up IMMEDIATELY, before any 3D library loads ──
+document.getElementById('enterBtn').addEventListener('click', function() {
+  var intro   = document.getElementById('intro');
+  var loading = document.getElementById('loading');
+  intro.classList.add('out');
+  loading.style.display = 'flex';
+  setTimeout(function() { intro.style.display = 'none'; }, 1100);
+  loadThreeAndStart();
 });
 
-// ═══════════════════════════════════════════════════════════
-// POST-PROCESSING RENDER TARGET
-// ═══════════════════════════════════════════════════════════
-let rtW = innerWidth, rtH = innerHeight;
-const rt = new THREE.WebGLRenderTarget(rtW, rtH, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
+document.getElementById('tClose').addEventListener('click', closeTerm);
+document.getElementById('tSend').addEventListener('click', transmit);
 
-// ═══════════════════════════════════════════════════════════
-// SHADER: BACKGROUND — animated noise field
-// ═══════════════════════════════════════════════════════════
-const bgVert = `
-varying vec2 vUv;
-void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
-`;
-const bgFrag = `
-precision highp float;
-uniform float uTime;
-uniform vec2 uRes;
-uniform vec2 uMouse;
-varying vec2 vUv;
-
-// simplex noise helpers
-vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
-vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
-vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
-vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-.85373472095314*r;}
-float snoise(vec3 v){
-  const vec2 C=vec2(1./6.,1./3.);
-  const vec4 D=vec4(0.,.5,1.,2.);
-  vec3 i=floor(v+dot(v,C.yyy));
-  vec3 x0=v-i+dot(i,C.xxx);
-  vec3 g=step(x0.yzx,x0.xyz);
-  vec3 l=1.-g;
-  vec3 i1=min(g.xyz,l.zxy);
-  vec3 i2=max(g.xyz,l.zxy);
-  vec3 x1=x0-i1+C.xxx;
-  vec3 x2=x0-i2+C.yyy;
-  vec3 x3=x0-D.yyy;
-  i=mod289(i);
-  vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
-  float n_=.142857142857;
-  vec3 ns=n_*D.wyz-D.xzx;
-  vec4 j=p-49.*floor(p*(ns.z*ns.z));
-  vec4 x_=floor(j*ns.z);
-  vec4 y_=floor(j-7.*x_);
-  vec4 x=x_*ns.x+ns.yyyy;
-  vec4 y=y_*ns.x+ns.yyyy;
-  vec4 h=1.-abs(x)-abs(y);
-  vec4 b0=vec4(x.xy,y.xy);
-  vec4 b1=vec4(x.zw,y.zw);
-  vec4 s0=floor(b0)*2.+1.;
-  vec4 s1=floor(b1)*2.+1.;
-  vec4 sh=-step(h,vec4(0.));
-  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
-  vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-  vec3 p0=vec3(a0.xy,h.x);
-  vec3 p1=vec3(a0.zw,h.y);
-  vec3 p2=vec3(a1.xy,h.z);
-  vec3 p3=vec3(a1.zw,h.w);
-  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-  p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
-  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);
-  m=m*m;
-  return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+function closeTerm() {
+  termOpen = false;
+  document.getElementById('term-ov').classList.remove('on');
+  document.getElementById('tStatus').textContent = '';
+  document.getElementById('tStatus').className = 't-status';
 }
 
-void main(){
-  vec2 uv = vUv;
-  vec2 mouse = uMouse / uRes;
-
-  // layered noise
-  float t = uTime * 0.12;
-  float n1 = snoise(vec3(uv * 2.5, t));
-  float n2 = snoise(vec3(uv * 5.0 + 0.3, t * 1.3));
-  float n3 = snoise(vec3(uv * 1.2, t * 0.7 + 10.));
-  float n = n1 * 0.5 + n2 * 0.3 + n3 * 0.2;
-
-  // mouse influence
-  float md = length(uv - mouse) * 2.0;
-  float mInfluence = exp(-md * md * 2.0) * 0.3;
-  n += mInfluence * snoise(vec3(uv * 3.0, t * 2.0));
-
-  // base dark color with green nebula tints
-  vec3 col = vec3(0.0);
-  col += vec3(0.0, 0.12, 0.06) * smoothstep(-0.2, 0.8, n);
-  col += vec3(0.02, 0.08, 0.04) * smoothstep(0.3, 1.0, n2);
-
-  // subtle grid lines
-  vec2 grid = fract(uv * 40.0);
-  float gLine = max(
-    smoothstep(0.97, 1.0, grid.x) + smoothstep(0.97, 1.0, grid.y),
-    smoothstep(0.0, 0.03, grid.x) + smoothstep(0.0, 0.03, grid.y)
-  );
-  col += vec3(0.0, 0.04, 0.02) * gLine * 0.15;
-
-  // vignette
-  float vig = 1.0 - smoothstep(0.3, 1.5, length(uv - 0.5) * 2.0);
-  col *= vig * 0.85 + 0.15;
-
-  gl_FragColor = vec4(col, 1.0);
-}
-`;
-
-const bgGeo = new THREE.PlaneGeometry(2, 2);
-const bgMat = new THREE.ShaderMaterial({
-  vertexShader: bgVert,
-  fragmentShader: bgFrag,
-  uniforms: {
-    uTime: { value: 0 },
-    uRes: { value: new THREE.Vector2(innerWidth, innerHeight) },
-    uMouse: { value: new THREE.Vector2(innerWidth/2, innerHeight/2) }
-  },
-  depthWrite: false, depthTest: false
-});
-const bgMesh = new THREE.Mesh(bgGeo, bgMat);
-bgMesh.renderOrder = -1;
-const bgScene = new THREE.Scene();
-const bgCam = new THREE.Camera();
-bgScene.add(bgMesh);
-
-// ═══════════════════════════════════════════════════════════
-// SHADER: POST-PROCESS — CRT scanlines + chromatic aberration + vignette
-// ═══════════════════════════════════════════════════════════
-const postVert = `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.); }`;
-const postFrag = `
-precision highp float;
-uniform sampler2D uTex;
-uniform float uTime;
-uniform vec2 uRes;
-varying vec2 vUv;
-
-void main(){
-  vec2 uv = vUv;
-
-  // Subtle barrel distortion
-  vec2 dc = uv - 0.5;
-  float r2 = dot(dc,dc);
-  uv = uv + dc * r2 * 0.035;
-
-  // Chromatic aberration
-  float ca = 0.0008 + r2 * 0.003;
-  float r = texture2D(uTex, uv + vec2(ca, 0.0)).r;
-  float g = texture2D(uTex, uv).g;
-  float b = texture2D(uTex, uv - vec2(ca, 0.0)).b;
-
-  vec3 col = vec3(r, g, b);
-
-  // Scanlines
-  float scan = sin(uv.y * uRes.y * 1.5) * 0.5 + 0.5;
-  col *= 0.93 + scan * 0.07;
-
-  // Vignette
-  float vig = smoothstep(1.1, 0.3, length(dc) * 1.8);
-  col *= vig;
-
-  // Film grain
-  float seed = dot(uv, vec2(12.9898, 78.233));
-  float noise = fract(sin(seed + uTime * 543.21) * 43758.5453);
-  col += (noise - 0.5) * 0.018;
-
-  gl_FragColor = vec4(col, 1.0);
-}
-`;
-const postGeo = new THREE.PlaneGeometry(2, 2);
-const postMat = new THREE.ShaderMaterial({
-  vertexShader: postVert,
-  fragmentShader: postFrag,
-  uniforms: {
-    uTex: { value: rt.texture },
-    uTime: { value: 0 },
-    uRes: { value: new THREE.Vector2(innerWidth, innerHeight) }
-  },
-  depthWrite: false, depthTest: false
-});
-const postMesh = new THREE.Mesh(postGeo, postMat);
-const postScene = new THREE.Scene();
-const postCam = new THREE.Camera();
-postScene.add(postMesh);
-
-// ═══════════════════════════════════════════════════════════
-// SHADER: PARTICLE SYSTEM with curl-noise movement
-// ═══════════════════════════════════════════════════════════
-const particleVert = `
-attribute float aSize;
-attribute float aSpeed;
-attribute float aOffset;
-attribute vec3 aColor;
-uniform float uTime;
-uniform float uScroll;
-varying vec3 vColor;
-varying float vAlpha;
-
-// hash
-float hash(float n){ return fract(sin(n)*43758.5453); }
-float hash3(vec3 p){ return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453); }
-
-void main(){
-  vColor = aColor;
-  vec3 pos = position;
-
-  // Drift particles through space over time
-  float t = uTime * aSpeed * 0.08 + aOffset;
-  pos.x += sin(t * 0.7 + aOffset * 3.1) * 1.2;
-  pos.y += cos(t * 0.5 + aOffset * 2.3) * 0.8;
-  pos.z += sin(t * 0.3 + aOffset * 1.7) * 1.5;
-
-  // scroll-based z translation
-  pos.z -= uScroll * 30.0;
-  // wrap
-  pos.z = mod(pos.z + 40.0, 80.0) - 40.0;
-
-  vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-  float dist = length(mv.xyz);
-  vAlpha = smoothstep(40.0, 2.0, dist) * 0.7;
-
-  gl_PointSize = aSize * (300.0 / dist);
-  gl_Position = projectionMatrix * mv;
-}
-`;
-const particleFrag = `
-precision mediump float;
-varying vec3 vColor;
-varying float vAlpha;
-void main(){
-  vec2 uv = gl_PointCoord - 0.5;
-  float d = length(uv);
-  if(d > 0.5) discard;
-  float alpha = (1.0 - d * 2.0) * vAlpha;
-  gl_FragColor = vec4(vColor, alpha);
-}
-`;
-
-const N = 3000;
-const pPos = new Float32Array(N * 3);
-const pSize = new Float32Array(N);
-const pSpeed = new Float32Array(N);
-const pOffset = new Float32Array(N);
-const pColor = new Float32Array(N * 3);
-const palette = [
-  [0.24, 0.84, 0.55], // green
-  [0.0,  0.78, 0.87], // cyan
-  [0.24, 0.84, 0.55],
-  [0.24, 0.84, 0.55],
-  [0.15, 0.42, 0.28], // dim green
-  [0.55, 0.32, 0.87], // purple
-];
-for (let i = 0; i < N; i++) {
-  pPos[i*3]   = (Math.random()-0.5)*50;
-  pPos[i*3+1] = (Math.random()-0.5)*30;
-  pPos[i*3+2] = (Math.random()-0.5)*80;
-  pSize[i]    = Math.random() * 2.5 + 0.5;
-  pSpeed[i]   = Math.random() * 0.5 + 0.2;
-  pOffset[i]  = Math.random() * Math.PI * 2;
-  const c = palette[Math.floor(Math.random()*palette.length)];
-  pColor[i*3]=c[0]; pColor[i*3+1]=c[1]; pColor[i*3+2]=c[2];
-}
-const pGeo = new THREE.BufferGeometry();
-pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-pGeo.setAttribute('aSize', new THREE.BufferAttribute(pSize, 1));
-pGeo.setAttribute('aSpeed', new THREE.BufferAttribute(pSpeed, 1));
-pGeo.setAttribute('aOffset', new THREE.BufferAttribute(pOffset, 1));
-pGeo.setAttribute('aColor', new THREE.BufferAttribute(pColor, 3));
-const pMat = new THREE.ShaderMaterial({
-  vertexShader: particleVert,
-  fragmentShader: particleFrag,
-  uniforms: { uTime: { value: 0 }, uScroll: { value: 0 } },
-  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
-});
-scene.add(new THREE.Points(pGeo, pMat));
-
-// ═══════════════════════════════════════════════════════════
-// SHADER: HOLOGRAPHIC FLOATING RINGS
-// ═══════════════════════════════════════════════════════════
-const ringVert = `
-uniform float uTime;
-uniform float uIndex;
-varying vec3 vNormal;
-varying vec3 vPos;
-varying float vAngle;
-void main(){
-  vNormal = normalMatrix * normal;
-  vPos = position;
-  float t = uTime * 0.3 + uIndex * 1.3;
-  float wobble = sin(uv.x * 6.28 + t) * 0.04;
-  vec3 pos = position + normal * wobble;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-}
-`;
-const ringFrag = `
-precision highp float;
-uniform float uTime;
-uniform float uIndex;
-varying vec3 vNormal;
-varying vec3 vPos;
-
-void main(){
-  vec3 norm = normalize(vNormal);
-  float t = uTime * 0.4;
-
-  // Fresnel
-  float fresnel = pow(1.0 - abs(dot(norm, vec3(0.,0.,1.))), 2.5);
-
-  // Iridescent color shift
-  float shift = sin(t + uIndex * 2.1 + vPos.y * 3.0) * 0.5 + 0.5;
-  vec3 col1 = vec3(0.24, 0.84, 0.55); // green
-  vec3 col2 = vec3(0.0,  0.78, 0.87); // cyan
-  vec3 col3 = vec3(0.78, 0.42, 0.87); // purple
-  vec3 iridCol = mix(mix(col1, col2, shift), col3, sin(t*0.7)*0.5+0.5);
-
-  // Wireframe-ish lines using fract
-  float lineX = fract(vPos.x * 8.0 + t * 0.3);
-  float lineY = fract(vPos.y * 8.0 - t * 0.2);
-  float lines = smoothstep(0.92, 1.0, lineX) + smoothstep(0.92, 1.0, lineY);
-  lines = min(lines, 1.0);
-
-  vec3 finalCol = iridCol * (fresnel * 0.7 + 0.1) + iridCol * lines * 0.5;
-  float alpha = fresnel * 0.5 + lines * 0.4 + 0.05;
-
-  gl_FragColor = vec4(finalCol, alpha * 0.7);
-}
-`;
-
-const rings = [];
-const ringConfigs = [
-  { rx:0.4, ry:0.2, rz:0, scale:2.2, tube:0.04 },
-  { rx:1.1, ry:0.8, rz:0.5, scale:1.6, tube:0.03 },
-  { rx:0.2, ry:1.4, rz:1.0, scale:2.8, tube:0.025 },
-  { rx:1.6, ry:0.1, rz:0.3, scale:1.9, tube:0.035 },
-];
-ringConfigs.forEach((cfg, i) => {
-  const geo = new THREE.TorusGeometry(1, cfg.tube, 16, 100);
-  const mat = new THREE.ShaderMaterial({
-    vertexShader: ringVert,
-    fragmentShader: ringFrag,
-    uniforms: { uTime: { value: 0 }, uIndex: { value: i } },
-    transparent: true, side: THREE.DoubleSide, depthWrite: false,
-    blending: THREE.AdditiveBlending
-  });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.scale.setScalar(cfg.scale);
-  mesh.rotation.set(cfg.rx, cfg.ry, cfg.rz);
-  scene.add(mesh);
-  rings.push({ mesh, mat, cfg });
-});
-
-// ═══════════════════════════════════════════════════════════
-// SHADER: CORE SPHERE (center piece)
-// ═══════════════════════════════════════════════════════════
-const sphereVert = `
-uniform float uTime;
-varying vec3 vNormal;
-varying vec3 vPos;
-varying vec2 vUv;
-
-// simplex 3d (compact)
-vec3 mod289v(vec3 x){return x-floor(x/289.)*289.;}
-vec4 mod289v(vec4 x){return x-floor(x/289.)*289.;}
-vec4 perm(vec4 x){return mod289v(((x*34.)+1.)*x);}
-float snoise3(vec3 v){
-  const vec2 C=vec2(1./6.,1./3.);
-  vec3 i=floor(v+dot(v,C.yyy));
-  vec3 x0=v-i+dot(i,C.xxx);
-  vec3 g=step(x0.yzx,x0.xyz);
-  vec3 l=1.-g; vec3 i1=min(g,l.zxy); vec3 i2=max(g,l.zxy);
-  vec3 x1=x0-i1+C.x; vec3 x2=x0-i2+C.y; vec3 x3=x0-.5;
-  i=mod289v(i);
-  vec4 p=perm(perm(perm(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
-  vec3 ns=vec3(0.142857,-0.142857,.285714)*vec3(7.,1.,7.)-vec3(.142857);
-  vec4 j=p-49.*floor(p*(ns.z*ns.z));
-  vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.*x_);
-  vec4 x=x_*ns.x+ns.y; vec4 y=y_*ns.x+ns.y;
-  vec4 h=1.-abs(x)-abs(y);
-  vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
-  vec4 s0=floor(b0)*2.+1.; vec4 s1=floor(b1)*2.+1.;
-  vec4 sh=-step(h,vec4(0.));
-  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-  vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y);
-  vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
-  vec4 norm=1.79284291-.85373472*vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3));
-  p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
-  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);
-  m=m*m; return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+function transmit() {
+  var name  = document.getElementById('tName').value.trim();
+  var email = document.getElementById('tEmail').value.trim();
+  var msg   = document.getElementById('tMsg').value.trim();
+  var st    = document.getElementById('tStatus');
+  if (!name)  { st.textContent = '> ERROR: Identity field empty.'; st.className = 't-status err'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { st.textContent = '> ERROR: Invalid reply-to.'; st.className = 't-status err'; return; }
+  if (!msg)   { st.textContent = '> ERROR: Payload empty.'; st.className = 't-status err'; return; }
+  st.textContent = '> Encrypting payload...'; st.className = 't-status';
+  setTimeout(function() {
+    st.textContent = '> Routing through secure node...';
+    setTimeout(function() {
+      st.textContent = '> TRANSMITTING';
+      var flash = document.getElementById('flash');
+      flash.style.opacity = '0.4';
+      setTimeout(function(){ flash.style.opacity='0'; }, 180);
+      var sub  = encodeURIComponent('[Bunker] ' + name + ' — Abdullah Al Khafaji');
+      var body = encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + msg);
+      window.location.href = 'mailto:contact@abdullahalk.dev?subject=' + sub + '&body=' + body;
+      setTimeout(function() {
+        st.textContent = '> COMPLETE. Channel closing.'; st.className = 't-status ok';
+        document.getElementById('tName').value = '';
+        document.getElementById('tEmail').value = '';
+        document.getElementById('tMsg').value = '';
+        setTimeout(closeTerm, 2500);
+      }, 700);
+    }, 700);
+  }, 500);
 }
 
-void main(){
-  vNormal = normalMatrix * normal;
-  vUv = uv;
-  float t = uTime * 0.25;
-  float disp = snoise3(normal * 2.5 + t) * 0.18
-             + snoise3(normal * 5.0 - t * 0.7) * 0.08;
-  vec3 displaced = position + normal * disp;
-  vPos = displaced;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
-}
-`;
-const sphereFrag = `
-precision highp float;
-uniform float uTime;
-varying vec3 vNormal;
-varying vec3 vPos;
-varying vec2 vUv;
-void main(){
-  vec3 n = normalize(vNormal);
-  float t = uTime * 0.3;
-  float fresnel = pow(1.0 - abs(dot(n, vec3(0.,0.,1.))), 3.0);
+var termOpen = false;
 
-  // animated color bands
-  float band = sin(vPos.y * 6.0 + t) * 0.5 + 0.5;
-  float band2 = sin(vPos.x * 4.0 - t * 0.7 + 1.5) * 0.5 + 0.5;
-  vec3 cA = vec3(0.15, 0.82, 0.48);
-  vec3 cB = vec3(0.0,  0.6,  0.82);
-  vec3 cC = vec3(0.5,  0.2,  0.82);
-  vec3 col = mix(cA, cB, band);
-  col = mix(col, cC, band2 * 0.3);
-  col *= fresnel * 1.5 + 0.2;
-
-  float alpha = fresnel * 0.8 + 0.1;
-  gl_FragColor = vec4(col, alpha);
-}
-`;
-const sphereGeo = new THREE.IcosahedronGeometry(1, 5);
-const sphereMat = new THREE.ShaderMaterial({
-  vertexShader: sphereVert,
-  fragmentShader: sphereFrag,
-  uniforms: { uTime: { value: 0 } },
-  transparent: true, side: THREE.DoubleSide, depthWrite: false,
-  blending: THREE.AdditiveBlending
-});
-const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-scene.add(sphere);
-
-// ═══════════════════════════════════════════════════════════
-// SHADER: GRID FLOOR
-// ═══════════════════════════════════════════════════════════
-const gridVert = `
-varying vec2 vUv;
-varying float vDist;
-void main(){
-  vUv = uv;
-  vec4 worldPos = modelMatrix * vec4(position, 1.0);
-  vDist = length(worldPos.xz);
-  gl_Position = projectionMatrix * viewMatrix * worldPos;
-}
-`;
-const gridFrag = `
-precision highp float;
-uniform float uTime;
-varying vec2 vUv;
-varying float vDist;
-void main(){
-  vec2 grid = fract(vUv * 60.0);
-  float line = max(
-    smoothstep(0.96,1.0,grid.x) + smoothstep(0.0,0.04,grid.x),
-    smoothstep(0.96,1.0,grid.y) + smoothstep(0.0,0.04,grid.y)
-  );
-  line = min(line, 1.0);
-
-  // pulse wave from center
-  float pulse = fract(vDist * 0.15 - uTime * 0.25);
-  float pLine = smoothstep(0.0, 0.05, pulse) * smoothstep(0.15, 0.05, pulse);
-
-  float fade = 1.0 - smoothstep(8.0, 30.0, vDist);
-  float alpha = (line * 0.25 + pLine * 0.15) * fade;
-
-  vec3 col = vec3(0.12, 0.7, 0.38);
-  gl_FragColor = vec4(col, alpha);
-}
-`;
-const gridPlanGeo = new THREE.PlaneGeometry(80, 80, 1, 1);
-const gridMat = new THREE.ShaderMaterial({
-  vertexShader: gridVert, fragmentShader: gridFrag,
-  uniforms: { uTime: { value: 0 } },
-  transparent: true, side: THREE.DoubleSide, depthWrite: false
-});
-const gridMesh = new THREE.Mesh(gridPlanGeo, gridMat);
-gridMesh.rotation.x = -Math.PI/2;
-gridMesh.position.y = -3;
-scene.add(gridMesh);
-
-// ═══════════════════════════════════════════════════════════
-// FLOATING WIREFRAME ICOSAHEDRA (skill nodes)
-// ═══════════════════════════════════════════════════════════
-const icoVert = `
-uniform float uTime;
-uniform float uIndex;
-varying vec3 vPos;
-void main(){
-  vPos = position;
-  float t = uTime * 0.5 + uIndex;
-  float pulse = sin(t) * 0.06 + 1.0;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position * pulse, 1.0);
-}
-`;
-const icoFrag = `
-precision mediump float;
-uniform float uTime;
-uniform float uIndex;
-uniform vec3 uColor;
-varying vec3 vPos;
-void main(){
-  float t = uTime * 0.4 + uIndex;
-  float glow = sin(t) * 0.3 + 0.7;
-  gl_FragColor = vec4(uColor * glow, 0.8);
-}
-`;
-
-const icoData = [
-  { pos: [-6, 2, -4],   color: [0.88, 0.42, 0.46], size: 0.5 },
-  { pos: [5,  3, -6],   color: [0.38, 0.69, 0.94], size: 0.6 },
-  { pos: [-4, -2, -8],  color: [0.78, 0.42, 0.87], size: 0.45 },
-  { pos: [7,  -1, -5],  color: [0.90, 0.75, 0.48], size: 0.55 },
-  { pos: [0,  4, -10],  color: [0.24, 0.84, 0.55], size: 0.7 },
-  { pos: [-8, 0, -7],   color: [0.34, 0.71, 0.84], size: 0.4 },
-];
-const icoNodes = [];
-icoData.forEach((d, i) => {
-  const geo = new THREE.IcosahedronGeometry(d.size, 0);
-  const edges = new THREE.EdgesGeometry(geo);
-  const mat = new THREE.ShaderMaterial({
-    vertexShader: icoVert, fragmentShader: icoFrag,
-    uniforms: {
-      uTime: { value: 0 }, uIndex: { value: i },
-      uColor: { value: new THREE.Vector3(...d.color) }
-    },
-    transparent: true, blending: THREE.AdditiveBlending
-  });
-  const mesh = new THREE.LineSegments(edges, mat);
-  mesh.position.set(...d.pos);
-  scene.add(mesh);
-  icoNodes.push({ mesh, mat });
-});
-
-// ═══════════════════════════════════════════════════════════
-// SCROLL + CAMERA ANIMATION
-// ═══════════════════════════════════════════════════════════
-const sections = [
-  { scrollT: 0,   camPos: [0, 0, 5],    camLook: [0, 0, 0],    panel: 'panel-hero' },
-  { scrollT: 0.2, camPos: [-3, 1, 2],   camLook: [-1, 0, -2],  panel: 'panel-skills' },
-  { scrollT: 0.4, camPos: [3, -1, 0],   camLook: [1, -0.5, -3],panel: 'panel-linux' },
-  { scrollT: 0.6, camPos: [-2, 2, -2],  camLook: [0, 0.5, -5], panel: 'panel-rhel' },
-  { scrollT: 0.8, camPos: [0, 0, -5],   camLook: [0, 0, -10],  panel: 'panel-contact' },
-];
-
-// Panel positions (screen space) for each section
-const panelPositions = {
-  'panel-hero':    { left:'8vw',  top:'50%', transform:'translateY(-50%)' },
-  'panel-skills':  { left:'5vw',  top:'50%', transform:'translateY(-50%)', maxWidth:'700px' },
-  'panel-linux':   { right:'5vw', top:'50%', transform:'translateY(-50%)', maxWidth:'640px' },
-  'panel-rhel':    { left:'5vw',  top:'50%', transform:'translateY(-50%)', maxWidth:'700px' },
-  'panel-contact': { left:'50%',  top:'50%', transform:'translate(-50%,-50%)' },
-};
-
-// Apply initial panel positions
-Object.entries(panelPositions).forEach(([id, pos]) => {
-  const el = document.getElementById(id);
-  Object.assign(el.style, pos);
-  el.style.maxWidth = pos.maxWidth || '580px';
-  el.style.width = '90vw';
-});
-
-// ── WHEEL-DRIVEN CAMERA SCROLL ──────────────────────────────
-// We drive targetScrollT from wheel events on the document.
-// If the wheel event originates inside a .panel-inner that can
-// still scroll in that direction, we let the browser handle it
-// natively and do NOT advance the camera.
-
-let targetScrollT = 0;
-let scrollT = 0;
-
-function canPanelScroll(el, deltaY) {
-  // Walk up to find the nearest scrollable panel-inner
-  let node = el;
-  while (node && node !== document.body) {
-    if (node.classList && node.classList.contains('panel-inner')) {
-      const atTop    = node.scrollTop <= 0;
-      const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
-      // If scrolling down and not at bottom, or up and not at top → let it scroll
-      if (deltaY > 0 && !atBottom) return true;
-      if (deltaY < 0 && !atTop)    return true;
-      return false; // panel is at its limit — hand off to camera
-    }
-    node = node.parentElement;
-  }
-  return false; // not inside a panel
-}
-
-document.addEventListener('wheel', (e) => {
-  if (canPanelScroll(e.target, e.deltaY)) return; // native panel scroll wins
-  e.preventDefault();
-  targetScrollT = Math.min(1, Math.max(0, targetScrollT + e.deltaY * 0.0003));
-  document.getElementById('progress').style.width = (targetScrollT * 100) + '%';
-}, { passive: false });
-
-// ── TOUCH SUPPORT (mobile swipe) ────────────────────────────
-let touchStartY = 0;
-let touchLastY = 0;
-let touchOnPanel = false;
-let activePanelEl = null;
-
-document.addEventListener('touchstart', (e) => {
-  touchStartY = e.touches[0].clientY;
-  touchLastY  = touchStartY;
-  // Detect if touch started inside a panel-inner
-  activePanelEl = null;
-  let node = e.target;
-  while (node && node !== document.body) {
-    if (node.classList && node.classList.contains('panel-inner')) {
-      activePanelEl = node;
-      break;
-    }
-    node = node.parentElement;
-  }
-  touchOnPanel = !!activePanelEl;
-}, { passive: true });
-
-document.addEventListener('touchmove', (e) => {
-  const currentY = e.touches[0].clientY;
-  const deltaY   = touchLastY - currentY; // positive = swipe up = scroll down
-  touchLastY     = currentY;
-
-  if (touchOnPanel && activePanelEl) {
-    // Check if the panel can still absorb this scroll
-    if (canPanelScroll(activePanelEl, deltaY)) {
-      // Let browser handle native panel scroll — do nothing
-      return;
-    }
-    // Panel hit its limit, fall through to camera
-  }
-
-  // Drive camera
-  e.preventDefault();
-  targetScrollT = Math.min(1, Math.max(0, targetScrollT + deltaY * 0.0008));
-  document.getElementById('progress').style.width = (targetScrollT * 100) + '%';
-}, { passive: false });
-
-// Nav clicks — jump to section
-document.querySelectorAll('.hud-link').forEach(link => {
-  link.addEventListener('click', () => {
-    const idx = parseInt(link.dataset.section);
-    targetScrollT = sections[idx].scrollT;
-    document.getElementById('progress').style.width = (targetScrollT * 100) + '%';
-  });
-});
-
-function lerp(a, b, t) { return a + (b-a)*t; }
-function lerpV3(a, b, t) { return [lerp(a[0],b[0],t), lerp(a[1],b[1],t), lerp(a[2],b[2],t)]; }
-
-let camPos = [0,0,5], camLook = [0,0,0];
-let currentSection = 0;
-const camTarget = new THREE.Vector3();
-
-// Mouse parallax
-let mouseNX = 0, mouseNY = 0;
-document.addEventListener('mousemove', e => {
-  mouseNX = (e.clientX/innerWidth - 0.5) * 2;
-  mouseNY = (e.clientY/innerHeight - 0.5) * 2;
-  bgMat.uniforms.uMouse.value.set(e.clientX, innerHeight - e.clientY);
-});
-
-// ═══════════════════════════════════════════════════════════
-// ANIMATION LOOP
-// ═══════════════════════════════════════════════════════════
-const clock = new THREE.Clock();
-function animate() {
-  requestAnimationFrame(animate);
-  const t = clock.getElapsedTime();
-  const dt = clock.getDelta ? 0.016 : 0.016;
-
-  // Smooth scroll
-  scrollT += (targetScrollT - scrollT) * 0.05;
-
-  // Find current section pair for interpolation
-  let secA = sections[0], secB = sections[1], localT = 0;
-  for (let i = 0; i < sections.length - 1; i++) {
-    if (scrollT >= sections[i].scrollT && scrollT <= sections[i+1].scrollT) {
-      const range = sections[i+1].scrollT - sections[i].scrollT;
-      localT = (scrollT - sections[i].scrollT) / range;
-      // ease
-      localT = localT * localT * (3 - 2*localT);
-      secA = sections[i];
-      secB = sections[i+1];
-      break;
-    } else if (scrollT > sections[sections.length-1].scrollT) {
-      secA = secB = sections[sections.length-1];
-      localT = 0;
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Escape' && termOpen) closeTerm();
+  if (e.code === 'KeyE' && window._bunkerReady && !termOpen) {
+    var last = window._chambers[window._chambers.length - 1];
+    if (Math.abs(window._currentZ - last.viewZ) < 6) {
+      termOpen = true;
+      document.getElementById('term-ov').classList.add('on');
+      setTimeout(function(){ document.getElementById('tName').focus(); }, 300);
     }
   }
+});
 
-  // Interpolate camera
-  const tPos = lerpV3(secA.camPos, secB.camPos, localT);
-  const tLook = lerpV3(secA.camLook, secB.camLook, localT);
-  camPos[0] = lerp(camPos[0], tPos[0], 0.04);
-  camPos[1] = lerp(camPos[1], tPos[1], 0.04);
-  camPos[2] = lerp(camPos[2], tPos[2], 0.04);
-  camLook[0] = lerp(camLook[0], tLook[0], 0.04);
-  camLook[1] = lerp(camLook[1], tLook[1], 0.04);
-  camLook[2] = lerp(camLook[2], tLook[2], 0.04);
-
-  // Mouse parallax offset
-  camera.position.set(
-    camPos[0] + mouseNX * 0.3,
-    camPos[1] - mouseNY * 0.2,
-    camPos[2]
-  );
-  camTarget.set(camLook[0], camLook[1], camLook[2]);
-  camera.lookAt(camTarget);
-
-  // Update HUD coords
-  document.getElementById('hud-coords').textContent =
-    `CAM X:${camera.position.x.toFixed(2)} Y:${camera.position.y.toFixed(2)} Z:${camera.position.z.toFixed(2)}`;
-
-  // Show/hide panels
-  const nearSection = scrollT < 0.1 ? 0
-    : scrollT < 0.3 ? 1
-    : scrollT < 0.5 ? 2
-    : scrollT < 0.7 ? 3 : 4;
-  sections.forEach((s, i) => {
-    const el = document.getElementById(s.panel);
-    if (i === nearSection) el.classList.add('visible');
-    else el.classList.remove('visible');
-  });
-
-  // Update shader uniforms
-  bgMat.uniforms.uTime.value = t;
-  pMat.uniforms.uTime.value = t;
-  pMat.uniforms.uScroll.value = scrollT;
-  postMat.uniforms.uTime.value = t;
-  sphereMat.uniforms.uTime.value = t;
-  gridMat.uniforms.uTime.value = t;
-  rings.forEach(r => { r.mat.uniforms.uTime.value = t; });
-  icoNodes.forEach(n => { n.mat.uniforms.uTime.value = t; });
-
-  // Animate sphere & rings
-  sphere.rotation.y = t * 0.12;
-  sphere.rotation.x = t * 0.07;
-  rings.forEach((r, i) => {
-    r.mesh.rotation.x += 0.003 * (i%2===0 ? 1 : -1);
-    r.mesh.rotation.y += 0.002 * (i%3===0 ? 1 : -1);
-    r.mesh.rotation.z += 0.001;
-  });
-  icoNodes.forEach((n, i) => {
-    n.mesh.rotation.x = t * 0.3 * (i%2===0?1:-1);
-    n.mesh.rotation.y = t * 0.4;
-  });
-
-  // Render to render target first
-  renderer.setRenderTarget(rt);
-  renderer.clear();
-  renderer.render(bgScene, bgCam);
-  renderer.render(scene, camera);
-
-  // Then post-process pass to screen
-  renderer.setRenderTarget(null);
-  renderer.render(postScene, postCam);
+// ── Lazy-load Three.js only after button click ──
+function loadThreeAndStart() {
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload = function() {
+    document.getElementById('loadTxt').textContent = 'Loading complete.';
+    setTimeout(startBunker, 400);
+  };
+  s.onerror = function() {
+    document.getElementById('loadTxt').textContent = 'Could not load 3D engine. Try refreshing.';
+  };
+  document.head.appendChild(s);
 }
-animate();
+
+function startBunker() {
+  document.getElementById('loading').style.display = 'none';
+  ['hud','corner','dots'].forEach(function(id){ document.getElementById(id).classList.add('on'); });
+
+  // ── Renderer ──
+  var renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  window.addEventListener('resize', function(){
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x050810);
+  scene.fog = new THREE.Fog(0x050810, 15, 65);
+
+  var camera = new THREE.PerspectiveCamera(72, window.innerWidth/window.innerHeight, 0.1, 150);
+
+  // Layout
+  var CW=5, CH=3.6, RW=9, RH=4.8, RD=12, SP=20;
+
+  var DEFS = [
+    {num:'00',title:'ENTRANCE',            col:0xe84000,lc:0xcc2200,label:'// Welcome',           head:'Abdullah Al Khafaji', desc:'A builder of systems from silicon to cloud. Walk forward to explore each domain.',                                                                             tags:['Rust','C/C++','WASM','Linux','K8s','Electronics']},
+    {num:'01',title:'LOW-LEVEL SYSTEMS',   col:0xff3300,lc:0xdd2200,label:'// Rust · C/C++',      head:'Protocol Engineering',desc:'Custom protocol stacks, zero-cost abstractions, and systems-level code where every byte carries purpose.',                                                    tags:['Rust','C','C++','Protocol Design','Memory Safety','FFI']},
+    {num:'02',title:'WEBASSEMBLY',         col:0x0099ff,lc:0x0066cc,label:'// WASM · Web',        head:'High-Perf Web',       desc:'Compiling systems code into the browser. Near-native execution speeds — erasing the line between desktop and the open web.',                                  tags:['WebAssembly','wasm-bindgen','web-sys','Rust→WASM','SIMD']},
+    {num:'03',title:'ELECTRONICS',         col:0xffaa00,lc:0xcc7700,label:'// Embedded · HW',     head:'Hardware & Circuits', desc:'Where abstraction ends and physics begins. PCB layout, embedded firmware, and direct hardware communication at the signal level.',                             tags:['Embedded','PCB Design','Firmware','UART/SPI/I2C','Bare Metal']},
+    {num:'04',title:'REVERSE ENGINEERING', col:0xaa00ff,lc:0x7700cc,label:'// Binary Analysis',   head:'Binary Analysis',     desc:'Taking systems apart from the binary up. Static analysis, dynamic instrumentation, protocol RE, and firmware extraction.',                                    tags:['Ghidra','IDA Pro','Dynamic Analysis','Binary RE','Protocol RE']},
+    {num:'05',title:'DEVOPS & INFRA',      col:0x00ee66,lc:0x00aa44,label:'// SysAdmin · DevOps', head:'Cloud Orchestration', desc:'HA Kubernetes clusters, container orchestration, and automated platform engineering at scale.',                                                              tags:['Kubernetes','Rancher','RKE2','OpenShift','RHEL','Ubuntu','oVirt']},
+    {num:'06',title:'SECURE TRANSMISSION', col:0x00ffcc,lc:0x00ccaa,label:'// Contact',           head:'Open a Channel',      desc:'Establish a secure line. If you are building something ambitious that demands precision — reach out.',                                                         tags:['Hiring','Collaboration','Contract','Open Source']}
+  ];
+
+  var chambers = DEFS.map(function(d,i){
+    return {num:d.num,title:d.title,col:d.col,lc:d.lc,label:d.label,head:d.head,desc:d.desc,tags:d.tags,
+      doorZ:-i*SP, modelZ:-i*SP-6, viewZ:-i*SP+3};
+  });
+  window._chambers = chambers;
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x223355, 2.5));
+  for(var lz=5; lz>-(SP*DEFS.length+15); lz-=6){
+    var cl=new THREE.PointLight(0x4466aa,0.8,14); cl.position.set(0,CH-0.4,lz); scene.add(cl);
+  }
+
+  function mkStd(col,emissive){ return new THREE.MeshStandardMaterial({color:col,emissive:emissive||0x000000,emissiveIntensity:emissive?0.7:0,roughness:0.8,metalness:0.1}); }
+  function mkBasic(col,opacity){ return opacity!==undefined ? new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:opacity}) : new THREE.MeshBasicMaterial({color:col}); }
+  function addMesh(geo,mat,x,y,z){ var m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); scene.add(m); return m; }
+
+  // Corridor
+  var tLen=SP*DEFS.length+20, midZ=5-tLen/2;
+  addMesh(new THREE.BoxGeometry(CW,.15,tLen),mkStd(0x0d1825),0,0,midZ);
+  addMesh(new THREE.BoxGeometry(CW,.15,tLen),mkStd(0x080c18),0,CH,midZ);
+  addMesh(new THREE.BoxGeometry(.15,CH,tLen),mkStd(0x0a0e1c),-CW/2,CH/2,midZ);
+  addMesh(new THREE.BoxGeometry(.15,CH,tLen),mkStd(0x0a0e1c), CW/2,CH/2,midZ);
+  addMesh(new THREE.BoxGeometry(.5,.18,tLen),mkStd(0x141c2a),-1.5,CH-.1,midZ);
+  addMesh(new THREE.BoxGeometry(.5,.18,tLen),mkStd(0x141c2a), 1.5,CH-.1,midZ);
+  addMesh(new THREE.BoxGeometry(.1,.04,tLen),mkBasic(0x223355,.9),0,CH-.02,midZ);
+  for(var gz=6;gz>midZ*2-5;gz-=1.8){ addMesh(new THREE.BoxGeometry(CW-.3,.01,.05),mkBasic(0x1a2840,.6),0,.08,gz); }
+  [-CW/2+.12,CW/2-.12].forEach(function(px){
+    addMesh(new THREE.BoxGeometry(.07,.07,tLen),mkStd(0x141e2c),px,.5,midZ);
+    addMesh(new THREE.BoxGeometry(.07,.07,tLen),mkStd(0x141e2c),px,CH-.5,midZ);
+  });
+
+  // Chambers
+  chambers.forEach(function(ch){
+    var dz=ch.doorZ, mz=ch.modelZ, c=ch.col, rc=dz-RD/2;
+    addMesh(new THREE.BoxGeometry(RW,.15,RD),mkStd(0x0c1422),0,0,rc);
+    addMesh(new THREE.BoxGeometry(RW,.15,RD),mkStd(0x080c18),0,RH,rc);
+    addMesh(new THREE.BoxGeometry(.15,RH,RD),mkStd(0x090d16),-RW/2,RH/2,rc);
+    addMesh(new THREE.BoxGeometry(.15,RH,RD),mkStd(0x090d16), RW/2,RH/2,rc);
+    addMesh(new THREE.BoxGeometry(RW,RH,.2),mkStd(0x0a0f1a),0,RH/2,dz-RD);
+    var fH=RH-CH; addMesh(new THREE.BoxGeometry(CW-.3,fH,.2),mkStd(0x090d16),0,CH+fH/2,dz);
+    addMesh(new THREE.BoxGeometry(.08,CH*.88,.15),mkBasic(c,.65),-CW/2+.06,CH*.44,dz);
+    addMesh(new THREE.BoxGeometry(.08,CH*.88,.15),mkBasic(c,.65), CW/2-.06,CH*.44,dz);
+    addMesh(new THREE.BoxGeometry(CW-.3,.08,.15),mkBasic(c,.65),0,CH*.91,dz);
+    [-RW/2+.1,RW/2-.1].forEach(function(wx){
+      addMesh(new THREE.BoxGeometry(.05,.05,RD*.95),mkBasic(c,.4),wx,.1,rc);
+      addMesh(new THREE.BoxGeometry(.05,.05,RD*.95),mkBasic(c,.4),wx,RH-.1,rc);
+    });
+    for(var bi=0;bi<5;bi++){ addMesh(new THREE.BoxGeometry(.05,RH*.8,.05),mkBasic(c,.3),-RW/2+1+bi*(RW-2)/4,RH*.5,dz-RD+.15); }
+    // Racks
+    [dz-3,dz-8].forEach(function(rz){
+      [-RW/2+1.1,RW/2-1.1].forEach(function(rx){
+        var rg=new THREE.Group();
+        var rb=new THREE.Mesh(new THREE.BoxGeometry(1.2,2.8,.6),mkStd(0x0e1520)); rb.position.set(0,1.4,0); rg.add(rb);
+        for(var r=0;r<10;r++){
+          var bay=new THREE.Mesh(new THREE.BoxGeometry(.95,.16,.48),mkStd(0x0b0f18)); bay.position.set(0,.28+r*.25,0); rg.add(bay);
+          var led=new THREE.Mesh(new THREE.BoxGeometry(.04,.04,.02),mkBasic(c)); led.position.set(.38,.28+r*.25,.33); rg.add(led);
+        }
+        rg.position.set(rx,0,rz); scene.add(rg);
+      });
+    });
+    // Room lights
+    var pl1=new THREE.PointLight(ch.lc,3.5,20); pl1.position.set(0,RH*.75,mz); scene.add(pl1);
+    var pl2=new THREE.PointLight(ch.lc,1.8,12); pl2.position.set(0,.5,mz); scene.add(pl2);
+    // Floor disc
+    var disc=new THREE.Mesh(new THREE.CircleGeometry(1.5,36),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.15,side:THREE.DoubleSide}));
+    disc.rotation.x=-Math.PI/2; disc.position.set(0,.08,mz); scene.add(disc);
+  });
+
+  // Centerpieces
+  var animObjs=[];
+  chambers.forEach(function(ch){
+    var z=ch.modelZ, cy=RH*.42, g=new THREE.Group();
+    g.position.set(0,cy,z);
+
+    if(ch.num==='00'){
+      for(var i=0;i<6;i++){
+        var r=new THREE.Mesh(new THREE.TorusGeometry(.38+i*.22,.022,8,80),mkBasic(ch.col,.75-i*.09));
+        r.rotation.x=(Math.PI/6)*i; r.userData={sy:.3+i*.1,sx:i*.06}; g.add(r);
+      }
+      g.userData={bob:true,baseY:cy};
+
+    }else if(ch.num==='01'){
+      var m1=mkStd(0xff3300,0x330800), w1=mkBasic(0xff6633,.2); w1.wireframe=true;
+      for(var i=0;i<9;i++){
+        var r1=.14+Math.random()*.42, phi=Math.acos(-1+2*i/9), th=Math.sqrt(9*Math.PI)*phi;
+        var mi=new THREE.Mesh(new THREE.IcosahedronGeometry(r1,1),m1);
+        var wi=new THREE.Mesh(new THREE.IcosahedronGeometry(r1*1.05,1),w1);
+        mi.position.setFromSphericalCoords(1.45,phi,th); wi.position.copy(mi.position);
+        mi.userData={sx:(Math.random()-.5)*.9,sy:(Math.random()-.5)*.9}; g.add(mi); g.add(wi);
+      }
+      var core=new THREE.Mesh(new THREE.IcosahedronGeometry(.4,2),m1); core.userData={sx:.4,sy:.7}; g.add(core);
+      g.userData={spinY:.18,bob:true,baseY:cy};
+
+    }else if(ch.num==='02'){
+      var mat2=mkStd(0x0088ff,0x001133);
+      var tk=new THREE.Mesh(new THREE.TorusKnotGeometry(.8,.2,180,16,2,5),mat2); tk.userData={sx:.3,sy:.55,sz:.12}; g.add(tk);
+      var tkw=new THREE.Mesh(new THREE.TorusKnotGeometry(.84,.22,180,16,2,5),mkBasic(0x44ccff,.15)); tkw.material.wireframe=true; tkw.userData={sx:-.18,sy:.3}; g.add(tkw);
+      for(var i=0;i<3;i++){var rr=new THREE.Mesh(new THREE.TorusGeometry(1.3+i*.35,.022,6,80),mkBasic(0x0099ff,.35-i*.09));rr.rotation.x=(Math.PI/3)*i;rr.userData={sx:.07,sy:.16+i*.09};g.add(rr);}
+      g.userData={bob:true,baseY:cy};
+
+    }else if(ch.num==='03'){
+      var chip=new THREE.Mesh(new THREE.BoxGeometry(1.2,.12,1.2),mkStd(0x1a2030)); g.add(chip);
+      for(var px=-3;px<=3;px++)for(var pz=-3;pz<=3;pz++){
+        if(Math.abs(px)===3||Math.abs(pz)===3){var pin=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.24,6),mkStd(0xffaa00,0x221100));pin.position.set(px*.18,-.18,pz*.18);g.add(pin);}
+      }
+      var die=new THREE.Mesh(new THREE.BoxGeometry(.58,.05,.58),mkStd(0x00aa55,0x003311)); die.position.y=.085; g.add(die);
+      for(var i=0;i<18;i++){var e=new THREE.Mesh(new THREE.SphereGeometry(.05,8,8),mkBasic(0xffaa00));e.userData={electron:true,o:{r:.8+Math.random()*1.1,theta:(i/18)*Math.PI*2,yb:(Math.random()-.5)*.6,spd:.6+Math.random()*1.1,tilt:Math.random()*Math.PI}};g.add(e);}
+      g.userData={spinY:.1,bob:true,baseY:cy};
+
+    }else if(ch.num==='04'){
+      var o4=new THREE.Mesh(new THREE.SphereGeometry(1,32,32),mkBasic(0x6600cc,.28)); o4.material.wireframe=true; o4.userData={sy:.15}; g.add(o4);
+      var i4=new THREE.Mesh(new THREE.SphereGeometry(.55,24,24),mkStd(0x9900ff,0x330044)); i4.userData={sx:.45,sy:.65}; g.add(i4);
+      for(var i=0;i<5;i++){var rr=new THREE.Mesh(new THREE.TorusGeometry(.78,.016,6,80),mkBasic(0xbb00ff,.45));rr.rotation.x=(Math.PI/5)*i;rr.rotation.y=(Math.PI/7)*i;rr.userData={sx:.05+i*.025,sy:.08};g.add(rr);}
+      for(var i=0;i<20;i++){var fr=new THREE.Mesh(new THREE.TetrahedronGeometry(.06,0),mkBasic(0xcc44ff));fr.position.setFromSphericalCoords(1.25,Math.acos(-1+2*i/20),Math.sqrt(20*Math.PI)*Math.acos(-1+2*i/20));fr.userData={fragment:true,axis:new THREE.Vector3(Math.random(),Math.random(),Math.random()).normalize(),spd:.2+Math.random()*.35};g.add(fr);}
+      g.userData={bob:true,baseY:cy};
+
+    }else if(ch.num==='05'){
+      var hub=new THREE.Mesh(new THREE.OctahedronGeometry(.42,2),mkStd(0x00cc66,0x003311)); hub.userData={sx:.3,sy:.5}; g.add(hub);
+      [[1.6,0,0],[-1.6,0,0],[0,0,1.6],[0,0,-1.6],[1.1,0,1.1],[-1.1,0,1.1],[1.1,0,-1.1],[-1.1,0,-1.1]].forEach(function(np){
+        var n=new THREE.Mesh(new THREE.BoxGeometry(.22,.22,.22),mkStd(0x0d2018)); n.position.set(np[0],np[1],np[2]); g.add(n);
+        var pts=[new THREE.Vector3(0,0,0),new THREE.Vector3(np[0],np[1],np[2])];
+        g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x00ff88,transparent:true,opacity:.3})));
+        var pkt=new THREE.Mesh(new THREE.BoxGeometry(.055,.055,.055),mkBasic(0x00ff88));
+        pkt.userData={packet:true,from:new THREE.Vector3(0,0,0),to:new THREE.Vector3(np[0],np[1],np[2]),t:Math.random(),spd:.35+Math.random()*.5}; g.add(pkt);
+      });
+      g.userData={spinY:.08,bob:true,baseY:cy};
+
+    }else if(ch.num==='06'){
+      g.position.set(0,0,z);
+      var body=new THREE.Mesh(new THREE.BoxGeometry(1.8,3.2,.3),mkStd(0x060e0c)); body.position.set(0,1.6,0); g.add(body);
+      var scr=new THREE.Mesh(new THREE.BoxGeometry(1.38,2.2,.04),mkBasic(0x00ffcc,.1)); scr.position.set(0,1.9,.18); g.add(scr);
+      for(var r=0;r<14;r++){var sl=new THREE.Mesh(new THREE.BoxGeometry(1.28,.04,.03),mkBasic(0x00ffcc,.2));sl.position.set(0,.85+r*.155,.2);g.add(sl);}
+      var cur=new THREE.Mesh(new THREE.BoxGeometry(.12,.13,.03),mkBasic(0x00ffcc)); cur.position.set(-.5,1.0,.2); cur.userData={blink:true}; g.add(cur);
+      [-0.93,0.93].forEach(function(ex){var eg=new THREE.Mesh(new THREE.BoxGeometry(.04,3.18,.04),mkBasic(0x00ffcc,.5));eg.position.set(ex,1.6,.16);g.add(eg);});
+      var base=new THREE.Mesh(new THREE.BoxGeometry(2.4,.1,.8),mkStd(0x0a1410)); base.position.set(0,.05,0); g.add(base);
+      for(var i=0;i<4;i++){var rr=new THREE.Mesh(new THREE.TorusGeometry(1.5+i*.5,.018,6,80),mkBasic(0x00ffcc,.32-i*.06));rr.rotation.x=Math.PI/3+i*.4;rr.rotation.y=i*.6;rr.userData={sy:.22+i*.1,sx:.05+i*.03};g.add(rr);}
+      for(var i=0;i<16;i++){var a6=(i/16)*Math.PI*2,r6=1.8+Math.random(),pk6=new THREE.Mesh(new THREE.BoxGeometry(.06,.06,.06),mkBasic(0x00ffcc));pk6.position.set(Math.cos(a6)*r6,.8+Math.random()*2.2,Math.sin(a6)*r6*.25);pk6.userData={fp:true,ang:a6,r:r6,yb:pk6.position.y,spd:.3+Math.random()*.4};g.add(pk6);}
+    }
+
+    scene.add(g); animObjs.push(g);
+  });
+
+  // Movement
+  var START_Z=chambers[0].viewZ, END_Z=chambers[chambers.length-1].viewZ;
+  var targetZ=START_Z, currentZ=START_Z;
+  window._currentZ = currentZ;
+  var mouseX=0, keys={}, autoMode=true, autoIdx=0, autoTimer=3.5;
+
+  camera.position.set(0,1.7,START_Z);
+
+  document.addEventListener('mousemove',function(e){mouseX=(e.clientX/window.innerWidth-.5)*2;});
+  document.addEventListener('keydown',function(e){
+    keys[e.code]=true;
+    if(autoMode&&!termOpen) autoMode=false;
+  });
+  document.addEventListener('keyup',function(e){keys[e.code]=false;});
+
+  window._bunkerReady=true;
+
+  var VIEW_Z=chambers.map(function(c){return c.viewZ;});
+  var lastIdx=-1;
+  function updateUI(idx){
+    if(idx===lastIdx)return; lastIdx=idx;
+    var ch=chambers[idx];
+    document.getElementById('cnum').textContent='// CHAMBER '+ch.num;
+    document.getElementById('cname').textContent=ch.title;
+    document.getElementById('ctags').innerHTML=ch.tags.slice(0,4).map(function(t){return '<div class="cl-tag">'+t+'</div>';}).join('');
+    document.getElementById('ssub').textContent=ch.label;
+    document.getElementById('stitle').textContent=ch.head;
+    document.getElementById('sdesc').textContent=ch.desc;
+    document.getElementById('stagsl').innerHTML=ch.tags.map(function(t){return '<span class="sp-tag">'+t+'</span>';}).join('');
+    var cl=document.getElementById('clabel'); cl.classList.remove('on'); setTimeout(function(){cl.classList.add('on');},80);
+    var sp=document.getElementById('spanel'); sp.classList.remove('on'); setTimeout(function(){sp.classList.add('on');},240);
+    document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('on',i===idx);});
+  }
+
+  var clock=new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    var dt=Math.min(clock.getDelta(),.05), t=clock.getElapsedTime();
+    if(!termOpen){
+      if(autoMode){
+        autoTimer-=dt;
+        if(autoTimer<=0){autoIdx=(autoIdx+1)%VIEW_Z.length;targetZ=VIEW_Z[autoIdx];autoTimer=3.5;}
+        currentZ+=(targetZ-currentZ)*(1-Math.pow(.008,dt));
+      }else{
+        if(keys['KeyW']||keys['ArrowUp'])   targetZ-=6*dt;
+        if(keys['KeyS']||keys['ArrowDown']) targetZ+=6*dt;
+        if(targetZ>START_Z)targetZ=START_Z;
+        if(targetZ<END_Z)  targetZ=END_Z;
+        currentZ+=(targetZ-currentZ)*(1-Math.pow(.04,dt));
+      }
+    }
+    window._currentZ=currentZ;
+    camera.position.z=currentZ;
+    camera.position.y=1.7+Math.sin(t*.7)*.02;
+    camera.position.x+=(0-camera.position.x)*.05;
+    camera.rotation.set(0,mouseX*.055,0);
+
+    var last=chambers[chambers.length-1];
+    document.getElementById('approach').classList.toggle('on',Math.abs(currentZ-last.viewZ)<6&&!termOpen);
+
+    var nearest=0,best=Infinity;
+    chambers.forEach(function(ch,i){var d=Math.abs(currentZ-ch.viewZ);if(d<best){best=d;nearest=i;}});
+    updateUI(nearest);
+
+    animObjs.forEach(function(g){
+      var ud=g.userData;
+      if(ud.bob) g.position.y=ud.baseY+Math.sin(t*.75)*.13;
+      if(ud.spinY) g.rotation.y+=ud.spinY*dt;
+      g.children.forEach(function(child){
+        var cd=child.userData; if(!cd)return;
+        if(cd.sx) child.rotation.x+=cd.sx*dt;
+        if(cd.sy) child.rotation.y+=cd.sy*dt;
+        if(cd.sz) child.rotation.z+=cd.sz*dt;
+        if(cd.blink) child.visible=Math.sin(t*4)>0;
+        if(cd.fp){cd.ang+=cd.spd*dt;child.position.x=Math.cos(cd.ang)*cd.r;child.position.z=Math.sin(cd.ang)*cd.r*.28;child.position.y=cd.yb+Math.sin(t*cd.spd+cd.ang)*.18;}
+        if(cd.electron){var o=cd.o;o.theta+=o.spd*dt;child.position.x=Math.cos(o.theta)*o.r;child.position.z=Math.sin(o.theta)*o.r;child.position.y=Math.sin(o.theta*2+o.tilt)*o.yb;}
+        if(cd.fragment) child.position.applyAxisAngle(cd.axis,cd.spd*dt);
+        if(cd.packet){cd.t=(cd.t+cd.spd*dt)%1;child.position.lerpVectors(cd.from,cd.to,cd.t);}
+      });
+    });
+    renderer.render(scene,camera);
+  }
+  animate();
+} // end startBunker
 </script>
 </body>
 </html>
