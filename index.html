@@ -51,8 +51,60 @@ canvas{display:block;position:fixed;inset:0;z-index:0}
 .dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.12);transition:all .3s}
 .dot.on{background:#e84000;box-shadow:0 0 7px #e84000;transform:scale(1.5)}
 
-#approach{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#00ffcc;text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;z-index:5}
+#approach{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#00ffcc;text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;z-index:5;white-space:nowrap}
 #approach.on{opacity:1}
+
+/* ── Touch nav arrows (mobile only) ── */
+#tnav{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:none;gap:16px;z-index:5;opacity:0;transition:opacity .8s}
+#tnav.on{opacity:1}
+@media(max-width:600px){#tnav{display:flex}}
+.tnbtn{width:52px;height:52px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.55);color:rgba(255,255,255,.5);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;border-radius:4px}
+.tnbtn:active{background:rgba(232,64,0,.3);border-color:#e84000;color:#e84000}
+
+/* ── Terminal button (mobile, replaces E key) ── */
+#termBtn{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);display:none;font-size:10px;letter-spacing:.18em;color:#00ffcc;text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .5s;z-index:5;background:rgba(0,20,16,.7);border:1px solid rgba(0,255,200,.35);padding:9px 18px;cursor:pointer;touch-action:manipulation;white-space:nowrap}
+#termBtn.on{opacity:1;pointer-events:all}
+
+@media(max-width:600px){
+  /* Intro tweaks */
+  .i-tag{font-size:9px;letter-spacing:.2em;margin-bottom:14px}
+  .i-sub{font-size:11px;letter-spacing:.08em;text-align:center;padding:0 16px}
+  #enterBtn{margin-top:36px;padding:13px 32px;font-size:11px}
+
+  /* Hide desktop WASD hud, show touch nav */
+  #hud{display:none!important}
+  #tnav{display:flex}
+
+  /* Hide desktop approach prompt, show touch terminal button */
+  #approach{display:none}
+  #termBtn{display:block}
+
+  /* Side panel → bottom sheet */
+  #spanel{top:auto;bottom:0;right:0;left:0;max-width:100%;transform:none!important;padding:12px 16px 20px;background:rgba(5,8,16,.92);border-top:1px solid rgba(232,64,0,.2);border-left:none}
+  #spanel.on{transform:none!important;opacity:1}
+  .sp-bar{border-left:none;border-top:2px solid #e84000;padding-left:0;padding-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+  .sp-sub{margin-bottom:0;margin-right:8px}
+  .sp-title{font-size:20px;margin-bottom:5px;width:100%}
+  .sp-desc{font-size:11px;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+  /* Dots → bottom-left */
+  #dots{right:auto;left:14px}
+
+  /* Corner name smaller */
+  .co-n{font-size:15px}
+  .co-t{display:none}
+
+  /* clabel smaller */
+  .cl-name{font-size:clamp(16px,4.5vw,28px)}
+  .cl-tags{display:none}
+
+  /* Terminal full screen on mobile */
+  #term-ov{align-items:flex-end}
+  #terminal{width:100%;max-height:92vh;overflow-y:auto;border-left:none;border-right:none;border-bottom:none}
+  .t-body{padding:16px 18px 24px}
+  .t-ta{rows:4}
+  .t-in{font-size:16px}/* prevent iOS zoom */
+}
 
 #term-ov{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
 #term-ov.on{opacity:1;pointer-events:all}
@@ -110,6 +162,13 @@ canvas{display:block;position:fixed;inset:0;z-index:0}
   <div class="hh">Walk the<br>bunker</div>
 </div>
 <div id="approach">[ Press E &mdash; Open Terminal ]</div>
+<button id="termBtn">[ TAP &mdash; Open Terminal ]</button>
+
+<!-- Touch navigation (mobile) -->
+<div id="tnav">
+  <div class="tnbtn" id="tnBack">&#8592;</div>
+  <div class="tnbtn" id="tnFwd">&#8594;</div>
+</div>
 <div id="flash"></div>
 
 <div id="term-ov">
@@ -147,6 +206,18 @@ document.getElementById('enterBtn').addEventListener('click', function() {
   loading.style.display = 'flex';
   setTimeout(function() { intro.style.display = 'none'; }, 1100);
   loadThreeAndStart();
+});
+
+// Mobile terminal button
+document.getElementById('termBtn').addEventListener('click', function() {
+  if (window._bunkerReady && !termOpen) {
+    var last = window._chambers && window._chambers[window._chambers.length - 1];
+    if (last && Math.abs((window._currentZ||0) - last.viewZ) < 8) {
+      termOpen = true;
+      document.getElementById('term-ov').classList.add('on');
+      setTimeout(function(){ document.getElementById('tName').focus(); }, 300);
+    }
+  }
 });
 
 document.getElementById('tClose').addEventListener('click', closeTerm);
@@ -411,6 +482,51 @@ function startBunker() {
 
   window._bunkerReady=true;
 
+  // ── Show correct controls ──
+  var isMobile = ('ontouchstart' in window) || (window.innerWidth < 700);
+  if (isMobile) {
+    document.getElementById('tnav').classList.add('on');
+  }
+
+  // ── Touch nav buttons ──
+  var tnFwd  = document.getElementById('tnFwd');
+  var tnBack = document.getElementById('tnBack');
+  var touchHeld = { fwd: false, back: false };
+
+  function setHeld(dir, val) {
+    touchHeld[dir] = val;
+    if (val) autoMode = false;
+  }
+  ['touchstart','mousedown'].forEach(function(ev){
+    tnFwd.addEventListener(ev,  function(e){ e.preventDefault(); setHeld('fwd',  true);  }, {passive:false});
+    tnBack.addEventListener(ev, function(e){ e.preventDefault(); setHeld('back', true);  }, {passive:false});
+  });
+  ['touchend','touchcancel','mouseup'].forEach(function(ev){
+    tnFwd.addEventListener(ev,  function(){ setHeld('fwd',  false); });
+    tnBack.addEventListener(ev, function(){ setHeld('back', false); });
+  });
+
+  // ── Swipe to navigate ──
+  var swipeStartX = null, swipeStartZ = null;
+  document.addEventListener('touchstart', function(e) {
+    if (termOpen) return;
+    // Ignore if touch is on a UI button
+    if (e.target.closest('#tnav') || e.target.closest('#termBtn') || e.target.closest('#term-ov')) return;
+    swipeStartX = e.touches[0].clientX;
+    swipeStartZ = targetZ;
+    autoMode = false;
+  }, { passive: true });
+  document.addEventListener('touchmove', function(e) {
+    if (termOpen || swipeStartX === null) return;
+    if (e.target.closest('#term-ov')) return;
+    var dx = e.touches[0].clientX - swipeStartX;
+    // swipe left = move forward (-Z), swipe right = move back (+Z)
+    targetZ = swipeStartZ - dx * 0.08;
+    if (targetZ > START_Z) targetZ = START_Z;
+    if (targetZ < END_Z)   targetZ = END_Z;
+  }, { passive: true });
+  document.addEventListener('touchend', function() { swipeStartX = null; }, { passive: true });
+
   var VIEW_Z=chambers.map(function(c){return c.viewZ;});
   var lastIdx=-1;
   function updateUI(idx){
@@ -438,8 +554,8 @@ function startBunker() {
         if(autoTimer<=0){autoIdx=(autoIdx+1)%VIEW_Z.length;targetZ=VIEW_Z[autoIdx];autoTimer=3.5;}
         currentZ+=(targetZ-currentZ)*(1-Math.pow(.008,dt));
       }else{
-        if(keys['KeyW']||keys['ArrowUp'])   targetZ-=6*dt;
-        if(keys['KeyS']||keys['ArrowDown']) targetZ+=6*dt;
+        if(keys['KeyW']||keys['ArrowUp']||touchHeld.fwd)   targetZ-=6*dt;
+        if(keys['KeyS']||keys['ArrowDown']||touchHeld.back) targetZ+=6*dt;
         if(targetZ>START_Z)targetZ=START_Z;
         if(targetZ<END_Z)  targetZ=END_Z;
         currentZ+=(targetZ-currentZ)*(1-Math.pow(.04,dt));
@@ -452,7 +568,10 @@ function startBunker() {
     camera.rotation.set(0,mouseX*.055,0);
 
     var last=chambers[chambers.length-1];
-    document.getElementById('approach').classList.toggle('on',Math.abs(currentZ-last.viewZ)<6&&!termOpen);
+    var nearLast = Math.abs(currentZ-last.viewZ)<6&&!termOpen;
+    document.getElementById('approach').classList.toggle('on', nearLast);
+    var termBtnEl = document.getElementById('termBtn');
+    if (termBtnEl) termBtnEl.classList.toggle('on', nearLast);
 
     var nearest=0,best=Infinity;
     chambers.forEach(function(ch,i){var d=Math.abs(currentZ-ch.viewZ);if(d<best){best=d;nearest=i;}});
