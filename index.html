@@ -3,1126 +3,1301 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Abdullah Al Khafaji — Developer</title>
+<title>Abdullah Al Khafaji, Developer</title>
+<meta name="description" content="Abdullah Al Khafaji builds peer-to-peer systems, offline-first apps, and decentralized tools. Rust, WebAssembly, WebRTC, and Linux.">
+<meta name="theme-color" content="#ffffff" id="theme-color">
+<script>
+/* Stamp the stored theme before first paint so the page never flashes the wrong mode. */
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Abdullah Al Khafaji, Developer">
+<meta property="og:description" content="Peer-to-peer systems, offline-first apps, and decentralized tools that work for people, not platforms.">
+<meta property="og:url" content="https://alkhafaji.dev">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
+/* ══ TOKENS ═══════════════════════════════════════════════════════════════
+   Editorial magazine system. Strict black-on-white duet, no chromatic
+   accent except the inline body-link blue. Square geometry throughout.  */
 :root {
-  --bg: #07080d;
-  --surface: #0d0e16;
-  --border: #181925;
-  --border2: #22243a;
-  --accent: #e05a2b;
-  --accent2: #4f8ef7;
-  --green: #39d353;
-  --text: #dde0ee;
-  --muted: #565872;
-  --mono: 'Space Mono', monospace;
-  --serif: 'DM Serif Display', serif;
-  --sans: 'Syne', sans-serif;
+  color-scheme: light;
+
+  --ink:          #000000;
+  --ink-soft:     #1a1a1a;
+  --body:         #757575;
+  --hairline:     #e0e0e0;
+  --canvas:       #ffffff;
+  --canvas-soft:  #f5f5f5;
+  --link:         #057dbc;
+
+  /* Inverted surfaces: masthead band, aspiration band, footer. */
+  --invert-bg:       #000000;
+  --invert-fg:       #ffffff;
+  --invert-hairline: rgba(255,255,255,0.20);
+  --invert-body:     rgba(255,255,255,0.68);
+  /* Inverted surfaces read as edges against white on their own; in dark mode
+     they sit close to the canvas and need a hairline to separate. */
+  --band-border:     transparent;
+
+  /* Line-art palette for the WebGL diagrams. Read by JS on every theme change. */
+  --viz-node:  #000000;
+  --viz-line:  #9e9e9e;
+  --viz-shell: #e0e0e0;
+  --viz-fill:  #f5f5f5;
+  --viz-band:  #000000;
+
+  --display: 'Playfair Display', 'Times New Roman', Georgia, serif;
+  --serif:   'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --sans:    'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  --sp-xs: 4px;  --sp-sm: 8px;  --sp-md: 12px; --sp-lg: 16px;
+  --sp-xl: 20px; --sp-2xl: 24px; --sp-3xl: 32px; --sp-4xl: 48px;
+
+  --shell:  1400px;
+  --gutter: clamp(20px, 4vw, 48px);
+  --secpad: clamp(48px, 7vw, 88px);
+  --navh:   64px;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* ── DARK PALETTE ─────────────────────────────────────────────────────────
+   The brand is a black-on-white duet, so dark mode is a polarity flip
+   rather than a recolour. Off-black and off-white instead of pure values,
+   which keeps depth on emissive screens. The two blocks below are
+   deliberately identical: the first follows the system, the second lets an
+   explicit choice win in either direction.                              */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --ink:          #f2f2f2;
+    --ink-soft:     #e2e2e2;
+    --body:         #9e9e9e;
+    --hairline:     #2e2e2e;
+    --canvas:       #0d0d0d;
+    --canvas-soft:  #171717;
+    --link:         #4ea9e0;
+
+    --invert-bg:       #1e1e1e;
+    --invert-fg:       #f2f2f2;
+    --invert-hairline: rgba(255,255,255,0.14);
+    --invert-body:     #9e9e9e;
+    --band-border:     #2e2e2e;
+
+    --viz-node:  #f2f2f2;
+    --viz-line:  #757575;
+    --viz-shell: #2e2e2e;
+    --viz-fill:  #171717;
+    --viz-band:  #1e1e1e;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ink:          #f2f2f2;
+  --ink-soft:     #e2e2e2;
+  --body:         #9e9e9e;
+  --hairline:     #2e2e2e;
+  --canvas:       #0d0d0d;
+  --canvas-soft:  #171717;
+  --link:         #4ea9e0;
+
+  --invert-bg:       #1e1e1e;
+  --invert-fg:       #f2f2f2;
+  --invert-hairline: rgba(255,255,255,0.14);
+  --invert-body:     #9e9e9e;
+  --band-border:     #2e2e2e;
+
+  --viz-node:  #f2f2f2;
+  --viz-line:  #757575;
+  --viz-shell: #2e2e2e;
+  --viz-fill:  #171717;
+  --viz-band:  #1e1e1e;
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--canvas);
+  color: var(--ink);
   font-family: var(--sans);
-  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 999; opacity: 0.5;
+img, canvas { display: block; max-width: 100%; }
+::selection { background: var(--ink); color: var(--canvas); }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.band-dark :focus-visible, .masthead :focus-visible, footer :focus-visible { outline-color: var(--invert-fg); }
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 999;
+  background: var(--ink); color: var(--canvas);
+  font: 700 14px/18px var(--sans); letter-spacing: 0.4px;
+  padding: var(--sp-md) var(--sp-xl);
 }
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 1.25rem 3.5rem;
-  border-bottom: 1px solid var(--border);
-  background: rgba(7,8,13,0.85);
-  backdrop-filter: blur(16px);
+.skip:focus { left: 0; }
+
+/* ══ TYPE SCALE ═══════════════════════════════════════════════════════════ */
+.d-hero {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(2.5rem, 6.2vw, 4rem);
+  line-height: 1.02; letter-spacing: -0.5px;
 }
-.nav-logo { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); letter-spacing: 0.06em; }
-.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.d-lg {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(2rem, 4.4vw, 3rem);
+  line-height: 1.05; letter-spacing: -0.4px;
+}
+.d-md {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.1; letter-spacing: -0.3px;
+}
+.d-sm {
+  font-family: var(--display); font-weight: 400;
+  font-size: 1.625rem; line-height: 1.08;
+}
+.d-xs {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.28px;
+}
+/* Italic display needs descender clearance for j / g / y */
+.d-hero em, .d-lg em, .d-md em, .d-sm em {
+  font-style: italic;
+  line-height: 1.1;
+  padding-bottom: 0.06em;
+  display: inline-block;
+}
+.lead {
+  font-family: var(--serif); font-size: 1.1875rem;
+  line-height: 1.47; letter-spacing: 0.108px;
+  max-width: 46ch;
+}
+.prose {
+  font-family: var(--serif); font-size: 1rem;
+  line-height: 1.5; letter-spacing: 0.09px;
+  color: var(--ink-soft); max-width: 62ch;
+}
+.prose p + p { margin-top: var(--sp-lg); }
+.prose a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+.prose strong { font-weight: 600; }
+.eyebrow {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.875rem; line-height: 1.28; letter-spacing: 0.4px;
+  text-transform: uppercase; color: var(--ink);
+  margin-bottom: var(--sp-md);
+}
+.caption {
+  font-family: var(--sans); font-size: 0.75rem; line-height: 1.33;
+  color: var(--body);
+}
+.label {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.75rem; line-height: 1.33; letter-spacing: 0.4px;
+  text-transform: uppercase; color: var(--body);
+}
+
+/* ══ SHELL ════════════════════════════════════════════════════════════════ */
+.shell { max-width: var(--shell); margin: 0 auto; padding-inline: var(--gutter); }
+.sec { padding-block: var(--secpad); }
+.sec-head { margin-bottom: clamp(28px, 4vw, 48px); }
+.sec-head-sub { margin-top: var(--secpad); }
+.rule { border: 0; border-top: 1px solid var(--hairline); }
+.rule-heavy { border: 0; border-top: 1px solid var(--ink); }
+
+/* ══ MASTHEAD BAND ════════════════════════════════════════════════════════ */
+.masthead {
+  background: var(--invert-bg); color: var(--invert-fg);
+  border-bottom: 1px solid var(--band-border);
+  padding-block: var(--sp-md);
+}
+.masthead .shell {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  gap: var(--sp-lg);
+}
+.masthead-mark {
+  grid-column: 2;
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.875rem; letter-spacing: 0.34em;
+  text-transform: uppercase; text-align: center; white-space: nowrap;
+}
+.masthead-side {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.75rem; letter-spacing: 0.4px; text-transform: uppercase;
+  color: var(--invert-body);
+}
+.masthead-side:last-child { text-align: right; }
+
+/* ══ NAV ══════════════════════════════════════════════════════════════════ */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--hairline);
+}
+.nav .shell {
+  height: var(--navh);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-2xl);
+}
+.nav-mark {
+  font-family: var(--display); font-size: 1.375rem; line-height: 1;
+  color: var(--ink); text-decoration: none; letter-spacing: 0.02em;
+}
+.nav-links { display: flex; align-items: center; gap: clamp(16px, 2.2vw, 32px); list-style: none; }
 .nav-links a {
-  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
-  text-decoration: none; letter-spacing: 0.12em; text-transform: uppercase;
-  transition: color 0.2s;
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.875rem; line-height: 1.28; letter-spacing: 0.4px;
+  color: var(--ink); text-decoration: none;
+  padding-block: 4px; border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--ease);
 }
-.nav-links a:hover { color: var(--text); }
+.nav-links a:hover { border-bottom-color: var(--ink); }
+.nav-right { display: flex; align-items: center; gap: var(--sp-2xl); }
+.nav-menu { display: none; }
 
-/* HERO */
-.hero {
-  position: relative; z-index: 1;
-  min-height: 100vh;
-  display: grid; grid-template-columns: 1fr 1fr;
-  align-items: center; padding-top: 5rem;
-  overflow: hidden;
+/* Theme toggle. Square like every other control; labelled in words because
+   the page carries no icon set. */
+.theme-toggle {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.75rem; line-height: 18px; letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--ink); background: var(--canvas);
+  border: 1px solid var(--hairline); border-radius: 0;
+  padding: 11px var(--sp-lg); cursor: pointer;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-#hero-canvas {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  z-index: 0; pointer-events: none;
-}
-.hero-content {
-  position: relative; z-index: 2;
-  padding: 4rem 3.5rem;
-}
-.hero-status {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  font-family: var(--mono); font-size: 0.68rem; color: var(--green);
-  letter-spacing: 0.15em; text-transform: uppercase;
-  margin-bottom: 2.5rem;
-}
-.hero-status::before {
-  content: '';
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green); box-shadow: 0 0 8px var(--green);
-  animation: pdot 2s ease infinite;
-}
-@keyframes pdot {
-  0%,100% { opacity:1; box-shadow:0 0 8px var(--green); }
-  50% { opacity:0.5; box-shadow:0 0 18px var(--green); }
-}
-.hero-name {
-  font-family: var(--serif);
-  font-size: clamp(2.8rem, 5vw, 5rem);
-  font-weight: 400; line-height: 1.06;
-  letter-spacing: -0.01em; margin-bottom: 1.75rem;
-}
-.hero-name .italic { font-style: italic; color: var(--muted); }
-.hero-name .accent-word { color: var(--accent); font-style: normal; }
-.hero-desc {
-  font-family: var(--mono); font-size: 0.78rem;
-  color: var(--muted); line-height: 2;
-  max-width: 390px; margin-bottom: 2.25rem;
-}
-.hero-desc strong { color: var(--text); }
-.hero-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.25rem; }
-.chip {
-  font-family: var(--mono); font-size: 0.64rem;
-  padding: 0.28rem 0.72rem;
-  border: 1px solid var(--border2); color: var(--muted);
-  letter-spacing: 0.06em; border-radius: 2px; transition: all 0.2s;
-}
-.chip:hover { border-color: var(--accent); color: var(--accent); }
-.chip.cr { border-color: rgba(224,90,43,0.35); color: #d4613a; }
-.chip.cw { border-color: rgba(79,142,247,0.35); color: var(--accent2); }
-.chip.cl { border-color: rgba(57,211,83,0.35); color: var(--green); }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
-.hero-3d {
-  position: relative; z-index: 2;
-  display: flex; align-items: center; justify-content: center;
-  height: 100vh;
-}
+.theme-toggle:hover { border-color: var(--ink); }
+.theme-toggle:active { transform: translateY(1px); }
+/* Without JS the control cannot do anything, so it must not be offered. */
+.no-js .theme-toggle { display: none; }
 
-/* SECTIONS */
-.sec {
-  position: relative; z-index: 1;
-  max-width: 1200px; margin: 0 auto;
-  padding: 7rem 3.5rem;
-}
-.sec-label {
-  font-family: var(--mono); font-size: 0.66rem; color: var(--accent);
-  letter-spacing: 0.25em; text-transform: uppercase;
-  margin-bottom: 0.85rem;
-  display: flex; align-items: center; gap: 0.75rem;
-}
-.sec-label::before { content: attr(data-n); color: var(--border2); }
-.sec-title {
-  font-family: var(--serif);
-  font-size: clamp(1.9rem, 3.5vw, 2.8rem);
-  font-weight: 400; margin-bottom: 3.5rem; line-height: 1.1;
-}
-.sec-title em { font-style: italic; color: var(--muted); }
-.hr {
-  width: calc(100% - 7rem); height: 1px; margin: 0 3.5rem;
-  background: linear-gradient(to right, transparent, var(--border2), transparent);
-  position: relative; z-index: 1;
-}
-
-/* PROJECTS GRID */
-.pgrid {
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 1px; background: var(--border);
-  border: 1px solid var(--border);
-}
-.pcard {
-  background: var(--surface); padding: 2.5rem;
-  position: relative; overflow: hidden;
-  transition: background 0.3s;
-}
-.pcard:hover { background: #10111c; }
-.pcard::after {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, var(--accent), transparent);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform 0.4s ease;
-}
-.pcard:hover::after { transform: scaleX(1); }
-.pcard-num {
-  font-family: var(--mono); font-size: 0.62rem; color: var(--border2);
-  letter-spacing: 0.1em; margin-bottom: 1.2rem;
-}
-.pcard-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.6rem; letter-spacing: -0.01em; }
-.pcard-desc { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); line-height: 1.95; margin-bottom: 1.5rem; }
-.tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-.tag {
-  font-family: var(--mono); font-size: 0.61rem;
-  padding: 0.17rem 0.55rem;
-  background: var(--bg); border: 1px solid var(--border2);
-  color: var(--muted); border-radius: 2px;
-}
-.tag.th { border-color: rgba(224,90,43,0.3); color: var(--accent); background: rgba(224,90,43,0.04); }
-.tag.tb { border-color: rgba(79,142,247,0.3); color: var(--accent2); background: rgba(79,142,247,0.04); }
-.tag.tg { border-color: rgba(57,211,83,0.3); color: var(--green); background: rgba(57,211,83,0.04); }
-
-.pcard.feat {
-  grid-column: 1 / -1;
-  display: grid; grid-template-columns: 1fr 360px;
-  gap: 0; padding: 0; align-items: stretch;
-}
-.pcard.feat .pcard-body { padding: 2.5rem; }
-.feat-3d {
-  border-left: 1px solid var(--border);
-  background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  min-height: 260px;
-}
-
-.pcard.lcard {
-  grid-column: 1 / -1;
-  display: grid; grid-template-columns: 360px 1fr;
-  gap: 0; padding: 0; align-items: stretch;
-}
-.pcard.lcard .pcard-body { padding: 2.5rem; }
-.linux-3d {
-  border-right: 1px solid var(--border);
-  background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  min-height: 260px;
-}
-
-/* OSS */
-.oss-block {
-  border: 1px solid var(--border2); background: var(--surface);
-  display: grid; grid-template-columns: 1fr 340px;
-  gap: 0; overflow: hidden;
-}
-.oss-body { padding: 2.5rem; }
-.oss-3d {
-  background: var(--bg);
-  border-left: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  min-height: 220px;
-}
-.oss-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem; }
-.oss-desc { font-family: var(--mono); font-size: 0.77rem; color: var(--muted); line-height: 1.9; }
-.oss-badge {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  margin-top: 1.25rem;
-  font-family: var(--mono); font-size: 0.68rem; color: var(--green);
-  border: 1px solid rgba(57,211,83,0.25); padding: 0.3rem 0.8rem; border-radius: 2px;
-}
-
-/* ABOUT */
-.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
-.about-text { font-family: var(--mono); font-size: 0.82rem; color: var(--muted); line-height: 2; }
-.about-text p+p { margin-top: 1.2rem; }
-.about-text strong { color: var(--text); }
-.ilist { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
-.ilist li {
-  display: flex; align-items: center; gap: 1rem;
-  font-family: var(--mono); font-size: 0.78rem; color: var(--muted);
-  padding: 0.85rem 1.25rem;
-  border: 1px solid var(--border); border-left: 2px solid var(--accent);
-  background: var(--surface); transition: all 0.2s;
-}
-.ilist li:hover { color: var(--text); border-color: var(--accent); }
-
-/* BLOG */
-.blog-box {
-  border: 1px solid var(--border2); padding: 3rem;
-  background: var(--surface);
-  display: grid; grid-template-columns: 1fr auto;
-  gap: 2rem; align-items: center;
-  position: relative; overflow: hidden;
-}
-.blog-box::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 80% 50%, rgba(79,142,247,0.05), transparent 70%);
-  pointer-events: none;
-}
-.blog-title { font-family: var(--serif); font-size: 1.55rem; margin-bottom: 0.5rem; font-weight: 400; }
-.blog-sub { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); line-height: 1.85; max-width: 500px; }
-
-/* CARD FOOTER (tags + actions row) */
-.pcard-footer {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;
-}
-.pcard-footer .tags { flex: 1; }
-
-/* GITHUB LINK */
-.gh-link {
-  display: inline-flex; align-items: center; gap: 0.45rem;
-  font-family: var(--mono); font-size: 0.68rem;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--accent2); text-decoration: none;
-  border: 1px solid rgba(79,142,247,0.3);
-  padding: 0.35rem 0.8rem; border-radius: 2px;
-  white-space: nowrap; flex-shrink: 0;
-  transition: all 0.2s;
-}
-.gh-link:hover {
-  background: rgba(79,142,247,0.1);
-  border-color: var(--accent2);
-  color: #fff;
-}
-.gh-link svg { flex-shrink: 0; }
-
-/* PROPRIETARY BADGE */
-.prop-badge {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  font-family: var(--mono); font-size: 0.64rem;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--muted);
-  border: 1px solid var(--border2);
-  padding: 0.35rem 0.8rem; border-radius: 2px;
-  white-space: nowrap; flex-shrink: 0;
-  cursor: default;
-}
-.prop-badge svg { flex-shrink: 0; opacity: 0.6; }
-
-/* BUTTONS */
+/* ══ BUTTONS ══════════════════════════════════════════════════════════════ */
 .btn {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  font-family: var(--mono); font-size: 0.7rem;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 0.8rem 1.6rem;
-  border: 1px solid var(--accent); color: var(--accent);
-  text-decoration: none; transition: all 0.2s; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-sm);
+  font-family: var(--sans); font-weight: 700;
+  font-size: 1rem; line-height: 20px; letter-spacing: 0.3px;
+  padding: var(--sp-md) var(--sp-xl);
+  border: 1px solid var(--ink); border-radius: 0;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
-.btn:hover { background: var(--accent); color: #fff; }
-.btn.ghost { border-color: var(--border2); color: var(--muted); }
-.btn.ghost:hover { background: var(--border2); color: var(--text); }
+.btn-primary { background: var(--ink); color: var(--canvas); }
+.btn-primary:hover { background: var(--canvas); color: var(--ink); }
+.btn-outline { background: var(--canvas); color: var(--ink); }
+.btn-outline:hover { background: var(--ink); color: var(--canvas); }
+.btn:active { transform: translateY(1px); }
+.btn-sm { font-size: 0.875rem; line-height: 18px; padding: 11px var(--sp-lg); }
+.band-dark .btn-primary { background: var(--invert-fg); color: var(--invert-bg); border-color: var(--invert-fg); }
+.band-dark .btn-primary:hover { background: transparent; color: var(--invert-fg); }
 
-/* FOOTER */
+/* ══ HERO ═════════════════════════════════════════════════════════════════ */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  gap: clamp(24px, 5vw, 72px);
+  align-items: center;
+  padding-block: clamp(32px, 5vw, 64px) clamp(40px, 6vw, 72px);
+  min-height: calc(100dvh - var(--navh) - 44px);
+}
+.hero-copy { max-width: 38ch; }
+.hero h1 { margin-bottom: var(--sp-2xl); }
+.hero .lead { color: var(--ink-soft); margin-bottom: var(--sp-3xl); }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: var(--sp-md); }
+.hero-figure { position: relative; }
+.hero-figure canvas { width: 100%; max-width: min(100%, 64vh); aspect-ratio: 1 / 1; margin-inline: auto; }
+.hero-figure figcaption { margin-top: var(--sp-md); }
+
+/* ══ TOPIC INDEX STRIP ════════════════════════════════════════════════════ */
+.topics { border-block: 1px solid var(--ink); }
+.topics ul {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+  list-style: none;
+  margin-inline: calc(var(--gutter) * -1);
+}
+.topics li {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.75rem; letter-spacing: 0.4px; text-transform: uppercase;
+  padding: var(--sp-lg) clamp(12px, 1.6vw, 20px);
+  border-left: 1px solid var(--hairline);
+}
+.topics li:first-child { border-left: 0; padding-left: var(--gutter); }
+.topics li:last-child { padding-right: var(--gutter); }
+
+/* ══ FEATURE STORY ════════════════════════════════════════════════════════ */
+.feature {
+  display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: clamp(24px, 4vw, 56px); align-items: center;
+  border-top: 1px solid var(--ink); padding-top: var(--sp-3xl);
+}
+.feature h3 { margin-bottom: var(--sp-lg); }
+.feature .prose { margin-bottom: var(--sp-2xl); }
+.feature-figure { border: 1px solid var(--hairline); background: var(--canvas-soft); }
+.feature-figure canvas { width: 100%; aspect-ratio: 4 / 3; }
+
+/* ══ THREE-COLUMN STORY STACK ═════════════════════════════════════════════ */
+.cols {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--ink); margin-top: var(--secpad);
+}
+.cols > article {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: var(--sp-3xl) clamp(20px, 2.4vw, 32px) 0;
+}
+.cols > article .src { margin-top: auto; }
+.cols > article:first-child { padding-left: 0; }
+.cols > article:last-child { padding-right: 0; }
+.cols > article + article { border-left: 1px solid var(--hairline); }
+.cols h3 { margin-bottom: var(--sp-md); }
+.cols .prose { margin-bottom: var(--sp-xl); }
+
+/* ══ STORY ROWS ═══════════════════════════════════════════════════════════ */
+.rows { border-top: 1px solid var(--ink); }
+.row {
+  display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr) auto;
+  gap: clamp(16px, 3vw, 40px); align-items: start;
+  padding-block: var(--sp-2xl);
+  border-bottom: 1px solid var(--hairline);
+}
+.row h3 { font-family: var(--sans); font-weight: 700; font-size: 1.0625rem; line-height: 1.29; letter-spacing: -0.144px; }
+.row .prose { font-size: 0.9375rem; }
+.row .label { white-space: nowrap; }
+
+/* ══ TAGS ═════════════════════════════════════════════════════════════════ */
+.tags { display: flex; flex-wrap: wrap; gap: var(--sp-sm); list-style: none; }
+.tags li {
+  font-family: var(--sans); font-size: 0.75rem; line-height: 1.33;
+  letter-spacing: 0.4px; color: var(--body);
+  border: 1px solid var(--hairline); padding: 3px var(--sp-sm);
+}
+.band-dark .tags li { color: var(--invert-body); border-color: var(--invert-hairline); }
+
+/* ══ SOURCE LINK ══════════════════════════════════════════════════════════ */
+.src {
+  display: inline-flex; align-items: center; gap: var(--sp-sm);
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.875rem; line-height: 1.28; letter-spacing: 0.4px;
+  text-transform: uppercase; color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid var(--ink); padding-bottom: 3px;
+  transition: opacity 0.2s var(--ease);
+}
+.src:hover { opacity: 0.55; }
+.src svg { flex-shrink: 0; }
+.card-foot {
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: var(--sp-lg);
+  margin-top: var(--sp-2xl);
+}
+
+/* ══ OPEN SOURCE SPLIT ════════════════════════════════════════════════════ */
+.split {
+  display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(24px, 4vw, 56px); align-items: center;
+  border-top: 1px solid var(--ink); padding-top: var(--sp-3xl);
+}
+.split-figure { border: 1px solid var(--hairline); background: var(--canvas-soft); }
+.split-figure canvas { width: 100%; aspect-ratio: 1 / 1; }
+.split h3 { margin-bottom: var(--sp-md); }
+.badge {
+  display: inline-block; margin-top: var(--sp-xl);
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.75rem; letter-spacing: 0.4px; text-transform: uppercase;
+  border: 1px solid var(--ink); padding: var(--sp-sm) var(--sp-md);
+}
+
+/* ══ INVERTED BAND (the one polarity flip) ════════════════════════════════ */
+.band-dark {
+  background: var(--invert-bg); color: var(--invert-fg);
+  border-block: 1px solid var(--band-border);
+  margin-top: var(--secpad);
+}
+.band-dark .prose { color: var(--invert-body); }
+.band-dark .label { color: var(--invert-body); }
+.band-inner {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(24px, 4vw, 64px); align-items: center;
+  padding-block: clamp(40px, 6vw, 72px);
+}
+.band-figure canvas { width: 100%; max-width: 420px; aspect-ratio: 1 / 1; margin-inline: auto; }
+.band-dark h3 { margin-bottom: var(--sp-lg); }
+.band-dark .tags { margin-top: var(--sp-2xl); }
+
+/* ══ ABOUT ════════════════════════════════════════════════════════════════ */
+.about {
+  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 5vw, 80px); align-items: start;
+  border-top: 1px solid var(--ink); padding-top: var(--sp-3xl);
+}
+.about .prose > p:first-child::first-letter {
+  float: left; font-family: var(--display); font-weight: 400;
+  font-size: 4.1em; line-height: 0.8;
+  padding: 0.06em 0.1em 0 0;
+}
+.index-card { background: var(--canvas-soft); padding: clamp(20px, 2.6vw, 32px); }
+.index-card h3 { margin-bottom: var(--sp-xl); }
+.index-group + .index-group { margin-top: var(--sp-2xl); padding-top: var(--sp-2xl); border-top: 1px solid var(--hairline); }
+.index-group h4 {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.75rem; letter-spacing: 0.4px; text-transform: uppercase;
+  color: var(--body); margin-bottom: var(--sp-md);
+}
+.index-group ul { list-style: none; display: grid; gap: var(--sp-sm); }
+.index-group li {
+  font-family: var(--serif); font-size: 1rem; line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ══ BLOG BLOCK ═══════════════════════════════════════════════════════════ */
+.blog-box {
+  border: 2px solid var(--ink);
+  padding: clamp(28px, 4.5vw, 56px);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(24px, 4vw, 56px); align-items: center;
+}
+.blog-box h3 { margin-bottom: var(--sp-lg); }
+
+/* ══ FOOTER ═══════════════════════════════════════════════════════════════ */
 footer {
-  position: relative; z-index: 1;
-  border-top: 1px solid var(--border);
-  padding: 2rem 3.5rem;
-  display: flex; justify-content: space-between; align-items: center;
+  background: var(--invert-bg); color: var(--invert-fg);
+  border-top: 1px solid var(--band-border);
+  padding-block: var(--sp-4xl); margin-top: var(--secpad);
 }
-.footer-copy { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
-.footer-links { display: flex; gap: 1.5rem; list-style: none; }
-.footer-links a { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); text-decoration: none; letter-spacing: 0.08em; transition: color 0.2s; }
-.footer-links a:hover { color: var(--accent); }
+.foot-top {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-3xl); align-items: end;
+  padding-bottom: var(--sp-3xl); border-bottom: 1px solid var(--invert-hairline);
+}
+.foot-mark { font-family: var(--display); font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1; }
+.foot-links { display: flex; flex-wrap: wrap; gap: var(--sp-2xl); list-style: none; }
+.foot-links a {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 0.875rem; letter-spacing: 0.4px; text-transform: uppercase;
+  color: var(--invert-fg); text-decoration: none;
+  border-bottom: 1px solid var(--invert-hairline); padding-bottom: 3px;
+  transition: border-color 0.2s var(--ease);
+}
+.foot-links a:hover { border-bottom-color: var(--invert-fg); }
+.foot-base {
+  padding-top: var(--sp-2xl);
+  font-family: var(--sans); font-size: 0.875rem; letter-spacing: 0.4px;
+  color: var(--invert-body);
+}
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  nav { padding: 1rem 1.5rem; }
-  .nav-links { display: none; }
-  .hero { grid-template-columns: 1fr; }
-  .hero-content { padding: 7rem 1.5rem 2rem; }
-  .hero-3d { height: 45vw; min-height: 260px; }
-  .sec { padding: 4rem 1.5rem; }
-  .hr { width: calc(100% - 3rem); margin: 0 1.5rem; }
-  .pgrid { grid-template-columns: 1fr; }
-  .pcard.feat, .pcard.lcard { grid-template-columns: 1fr; }
-  .feat-3d, .linux-3d { min-height: 200px; border: none; border-top: 1px solid var(--border); }
-  .oss-block { grid-template-columns: 1fr; }
-  .oss-3d { border-left: none; border-top: 1px solid var(--border); min-height: 200px; }
-  .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+/* ══ REVEAL ═══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Without JS the IntersectionObserver never fires, so the reveal must not hide. */
+.no-js .reveal { opacity: 1; transform: none; }
+
+/* ══ RESPONSIVE ═══════════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  .topics ul { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .topics li:nth-child(4n + 1) { border-left: 0; }
+  .topics li:nth-child(n + 5) { border-top: 1px solid var(--hairline); }
+  .feature { grid-template-columns: 1fr; }
+  .feature-figure { order: -1; }
+  .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols > article:nth-child(2) { padding-right: 0; }
+  .cols > article:nth-child(3) { padding-left: 0; border-left: 0; border-top: 1px solid var(--hairline); margin-top: var(--sp-3xl); }
+  .about { grid-template-columns: 1fr; }
+  .split, .band-inner { grid-template-columns: 1fr; }
+  .split-figure { max-width: 320px; }
+  .band-figure { max-width: 340px; }
+}
+@media (max-width: 767px) {
+  :root { --navh: 56px; }
+  .masthead .shell { grid-template-columns: 1fr; }
+  .masthead-side { display: none; }
+  .masthead-mark { grid-column: 1; }
+  .nav-links {
+    display: none; position: absolute; top: var(--navh); left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--canvas); border-bottom: 1px solid var(--ink);
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { display: block; padding: var(--sp-lg) var(--gutter); border-bottom: 1px solid var(--hairline); }
+  .nav-links a:hover { border-bottom-color: var(--hairline); background: var(--canvas-soft); }
+  .nav-right { gap: var(--sp-md); }
+  .theme-toggle { padding: 11px var(--sp-md); }
+  .nav-menu {
+    display: inline-flex; align-items: center;
+    background: none; border: 0; color: var(--ink);
+    font-family: var(--sans); font-weight: 700;
+    font-size: 0.875rem; letter-spacing: 0.4px; text-transform: uppercase;
+    padding: var(--sp-sm) 0; cursor: pointer;
+  }
+  .hero { grid-template-columns: 1fr; min-height: 0; gap: var(--sp-3xl); }
+  .hero-copy { max-width: none; }
+  .hero-figure canvas { max-height: 44vh; }
+  .topics ul { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-inline: 0; }
+  .topics li { border-left: 0; padding: var(--sp-md) 0; }
+  .topics li:nth-child(n + 5) { border-top: 0; }
+  .topics li:nth-child(even) { padding-left: var(--sp-lg); border-left: 1px solid var(--hairline); }
+  .topics li:first-child, .topics li:last-child { padding-inline: 0; }
+  .topics li:last-child { grid-column: 1 / -1; border-top: 1px solid var(--hairline); }
+  .cols { grid-template-columns: 1fr; }
+  .cols > article { padding-inline: 0; }
+  .cols > article + article { border-left: 0; border-top: 1px solid var(--hairline); margin-top: var(--sp-3xl); }
+  .cols > article:nth-child(3) { margin-top: var(--sp-3xl); }
+  .row { grid-template-columns: 1fr; gap: var(--sp-md); }
+  .split-figure, .band-figure { max-width: none; }
   .blog-box { grid-template-columns: 1fr; }
-  footer { flex-direction: column; gap: 1rem; padding: 1.5rem; text-align: center; }
+  .foot-top { grid-template-columns: 1fr; align-items: start; gap: var(--sp-2xl); }
 }
 </style>
 </head>
-<body>
+<body class="no-js">
+<script>document.body.classList.remove('no-js');</script>
 
-<nav>
-  <div class="nav-logo">// AAK</div>
-  <ul class="nav-links">
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#oss">Open Source</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#blog">Blog</a></li>
-  </ul>
-</nav>
+<a class="skip" href="#main">Skip to content</a>
 
-<!-- HERO -->
-<div class="hero">
-  <canvas id="hero-canvas"></canvas>
-
-  <div class="hero-content">
-    <div class="hero-status">Open to work</div>
-    <h1 class="hero-name">
-      Abdullah<br>
-      <span class="italic">Al <span class="accent-word">Khafaji</span></span>
-    </h1>
-    <p class="hero-desc">
-      I build software that <strong>doesn't need servers</strong> to exist —
-      peer-to-peer systems, offline-first apps, and decentralized tools
-      that work for people, not platforms.
-      <br><br>
-      Aspiring <strong>Linux kernel contributor</strong>.
-      Passionate about open source, Rust, and WebAssembly.
-    </p>
-    <div class="hero-chips">
-      <span class="chip cr">Rust</span>
-      <span class="chip cw">WebAssembly</span>
-      <span class="chip">P2P / WebRTC</span>
-      <span class="chip">Distributed Systems</span>
-      <span class="chip cl">Linux</span>
-      <span class="chip">No-Signup UX</span>
-      <span class="chip">Open Source</span>
-    </div>
-    <div class="hero-ctas">
-      <a href="#projects" class="btn">View Projects</a>
-      <a href="#blog" class="btn ghost">Read Blog</a>
-    </div>
-  </div>
-
-  <div class="hero-3d">
-    <canvas id="p2p-canvas" style="width:100%;height:100%;display:block;"></canvas>
+<!-- MASTHEAD BAND -->
+<div class="masthead">
+  <div class="shell">
+    <span class="masthead-side">Portfolio</span>
+    <span class="masthead-mark">Abdullah Al Khafaji</span>
+    <span class="masthead-side">Open to work</span>
   </div>
 </div>
 
-<div class="hr"></div>
+<!-- NAV -->
+<header class="nav" id="top">
+  <div class="shell">
+    <a class="nav-mark" href="#top" aria-label="Abdullah Al Khafaji, home">AAK</a>
+    <div class="nav-right">
+      <button class="nav-menu" id="menu-btn" aria-expanded="false" aria-controls="nav-links">Menu</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#oss">Open Source</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#blog">Blog</a></li>
+      </ul>
+      <button class="theme-toggle" id="theme-btn" type="button" aria-label="Switch to dark theme">
+        <span id="theme-label">Dark</span>
+      </button>
+      <a class="btn btn-primary btn-sm" href="mailto:abdullah@alkhafaji.dev">Email</a>
+    </div>
+  </div>
+</header>
 
-<!-- PROJECTS -->
-<section class="sec" id="projects">
-  <div class="sec-label" data-n="01">Work</div>
-  <h2 class="sec-title">Things I've <em>built</em></h2>
+<main id="main">
 
-  <div class="pgrid">
-    <div class="pcard feat">
-      <div class="pcard-body">
-        <div class="pcard-num">001 — Featured</div>
-        <h3 class="pcard-title">Decentralized P2P Chat</h3>
-        <p class="pcard-desc">
-          Zero sign-up. No servers. Built on WebRTC + PeerJS with sophisticated
-          fault-tolerance and recovery — connections survive peer churn,
-          network splits, and partial failures. Ships as a PWA: installable,
-          offline-capable, genuinely serverless.
-        </p>
-        <div class="pcard-footer">
-          <div class="tags">
-            <span class="tag th">WebRTC</span>
-            <span class="tag th">PeerJS</span>
-            <span class="tag">P2P</span>
-            <span class="tag">PWA</span>
-            <span class="tag">Fault Tolerance</span>
-            <span class="tag">Decentralized</span>
-            <span class="tag">No Signup</span>
+  <!-- HERO -->
+  <div class="shell">
+    <div class="hero">
+      <div class="hero-copy">
+        <h1 class="d-hero">Abdullah<br><em>Al Khafaji</em></h1>
+        <p class="lead">I build peer-to-peer systems, offline-first apps, and decentralized tools that work for people, not platforms.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#projects">View projects</a>
+          <a class="btn btn-outline" href="#blog">Read the blog</a>
+        </div>
+      </div>
+      <figure class="hero-figure">
+        <canvas id="p2p-canvas" role="img" aria-label="Diagram of a peer-to-peer mesh: nodes distributed over a sphere, linked to their nearest neighbours."></canvas>
+        <figcaption class="caption">A peer-to-peer mesh. Every node routes for every other node.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- TOPIC INDEX -->
+  <div class="topics">
+    <div class="shell">
+      <ul>
+        <li>Rust</li>
+        <li>WebAssembly</li>
+        <li>P2P and WebRTC</li>
+        <li>Distributed systems</li>
+        <li>Linux</li>
+        <li>No-signup UX</li>
+        <li>Open source</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <section class="sec" id="projects">
+    <div class="shell">
+      <header class="sec-head">
+        <h2 class="d-lg">Things I've <em>built</em></h2>
+      </header>
+
+      <!-- Feature story -->
+      <article class="feature reveal">
+        <div>
+          <p class="eyebrow">Featured</p>
+          <h3 class="d-md">Decentralized P2P Chat</h3>
+          <div class="prose">
+            <p>Zero sign-up. No servers. Built on WebRTC and PeerJS with real fault tolerance and recovery, so connections survive peer churn, network splits, and partial failures. Ships as a PWA: installable, offline-capable, genuinely serverless.</p>
           </div>
-          <a href="https://github.com/BraveOPotato/GilgaMesh" target="_blank" rel="noopener" class="gh-link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-            View on GitHub
+          <div class="card-foot">
+            <ul class="tags">
+              <li>WebRTC</li><li>PeerJS</li><li>P2P</li><li>PWA</li><li>Fault tolerance</li><li>No signup</li>
+            </ul>
+            <a class="src" href="https://github.com/BraveOPotato/GilgaMesh" target="_blank" rel="noopener">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              Source
+            </a>
+          </div>
+        </div>
+        <figure class="feature-figure">
+          <canvas id="p2p-detail-canvas" role="img" aria-label="Diagram of packets travelling between peers along mesh links."></canvas>
+        </figure>
+      </article>
+
+      <!-- Three-column story stack -->
+      <div class="cols">
+        <article class="reveal">
+          <h3 class="d-sm">Offline-First Kanban Board</h3>
+          <div class="prose">
+            <p>Collaborative task board with no accounts. Works offline first and syncs through Cloudflare Workers KV, deployed at the edge so it is fast from anywhere.</p>
+          </div>
+          <a class="src" href="https://github.com/BraveOPotato/FlowBoard" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            Source
           </a>
+        </article>
+
+        <article class="reveal">
+          <h3 class="d-sm">ModalEngine</h3>
+          <div class="prose">
+            <p>A lightweight JavaScript library for modals built on native Web Components. Framework-agnostic, zero dependencies, drops into any stack without ceremony.</p>
+          </div>
+          <a class="src" href="https://github.com/BraveOPotato/ModalEngine" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            Source
+          </a>
+        </article>
+
+        <article class="reveal">
+          <h3 class="d-sm">Markdown Blog Engine</h3>
+          <div class="prose">
+            <p>Lightweight, self-hosted blog powered by plain Markdown. No CMS overhead: write, deploy, done. It runs <a href="https://blog.alkhafaji.dev">my own writing</a>.</p>
+          </div>
+          <a class="src" href="https://github.com/BraveOPotato/devlog" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            Source
+          </a>
+        </article>
+      </div>
+
+      <!-- Client and internal work -->
+      <header class="sec-head sec-head-sub">
+        <h2 class="d-md">Client and internal <em>work</em></h2>
+      </header>
+      <div class="rows">
+        <article class="row reveal">
+          <h3>Server Monitoring Application</h3>
+          <div class="prose">
+            <p>Infrastructure monitoring over NRPE and SNMP across heterogeneous server environments, with a custom scheduler for polling intervals, threshold alerting, and status aggregation.</p>
+          </div>
+          <span class="label">Proprietary</span>
+        </article>
+        <article class="row reveal">
+          <h3>SysAdmin Links Hub</h3>
+          <div class="prose">
+            <p>A curated, self-managed links hub for systems administrators. Full CRUD over the tools, dashboards, and documentation a team reaches for every day.</p>
+          </div>
+          <span class="label">Proprietary</span>
+        </article>
+        <article class="row reveal">
+          <h3>Grant Application Platform</h3>
+          <div class="prose">
+            <p>Multi-role platform for academic grant management. Professors submit through a structured workflow, reviewers evaluate from a dedicated dashboard, administrators control the lifecycle.</p>
+          </div>
+          <span class="label">Proprietary</span>
+        </article>
+        <article class="row reveal">
+          <h3>LDAP CRUD GUI</h3>
+          <div class="prose">
+            <p>Desktop application for managing an LDAP directory server. Creates, reads, updates, and deletes entries without hand-writing LDIF files or falling back to the command line.</p>
+          </div>
+          <span class="label">Proprietary</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN SOURCE -->
+  <section class="sec" id="oss">
+    <div class="shell">
+      <header class="sec-head">
+        <h2 class="d-lg">Open <em>Source</em></h2>
+      </header>
+
+      <article class="split reveal">
+        <figure class="split-figure">
+          <canvas id="oss-canvas" role="img" aria-label="Diagram of a wireframe polyhedron circled by three orbital rings."></canvas>
+        </figure>
+        <div>
+          <h3 class="d-md">Brave Browser Debloater</h3>
+          <div class="prose">
+            <p>Contributed to an open-source project that strips unnecessary bloat from the Brave browser: less telemetry, fewer unwanted features, and control returned to the person using it. Software should do exactly what you ask and nothing more.</p>
+          </div>
+          <p class="badge">Open source contributor</p>
         </div>
-      </div>
-      <div class="feat-3d">
-        <canvas id="p2p-detail-canvas" style="width:100%;height:100%;display:block;"></canvas>
-      </div>
+      </article>
     </div>
 
-    <div class="pcard">
-      <div class="pcard-num">002</div>
-      <h3 class="pcard-title">Offline-First Kanban Board</h3>
-      <p class="pcard-desc">
-        Collaborative task board with no accounts. Works offline-first,
-        syncs via Cloudflare Workers KV. Deployed at the edge — fast from anywhere.
-      </p>
-      <div class="pcard-footer">
-        <div class="tags">
-          <span class="tag tb">Cloudflare Pages</span>
-          <span class="tag tb">Workers KV</span>
-          <span class="tag">Offline-First</span>
-          <span class="tag">Collaboration</span>
-          <span class="tag">No Signup</span>
-        </div>
-        <a href="https://github.com/BraveOPotato/FlowBoard" target="_blank" rel="noopener" class="gh-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          View on GitHub
-        </a>
-      </div>
-    </div>
-
-    <div class="pcard">
-      <div class="pcard-num">003</div>
-      <h3 class="pcard-title">ModalEngine</h3>
-      <p class="pcard-desc">
-        A lightweight JS library for creating modals using native Web Components.
-        Framework-agnostic, zero dependencies, drops into any stack without ceremony.
-      </p>
-      <div class="pcard-footer">
-        <div class="tags">
-          <span class="tag th">Web Components</span>
-          <span class="tag">JavaScript</span>
-          <span class="tag">Library</span>
-          <span class="tag">Zero-Dep</span>
-        </div>
-        <a href="https://github.com/BraveOPotato/ModalEngine" target="_blank" rel="noopener" class="gh-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          View on GitHub
-        </a>
-      </div>
-    </div>
-
-    <div class="pcard">
-      <div class="pcard-num">004</div>
-      <h3 class="pcard-title">Markdown Blog Engine</h3>
-      <p class="pcard-desc">
-        Lightweight, self-hosted blog powered by plain Markdown. No CMS overhead —
-        write, deploy, done. The engine behind my own writing.
-      </p>
-      <div class="pcard-footer">
-        <div class="tags">
-          <span class="tag">Markdown</span>
-          <span class="tag">Static Site</span>
-          <span class="tag">Lightweight</span>
-          <span class="tag">Self-Hosted</span>
-        </div>
-        <a href="https://github.com/BraveOPotato/devlog" target="_blank" rel="noopener" class="gh-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          View on GitHub
-        </a>
-      </div>
-    </div>
-
-    <!-- WORK PROJECTS (proprietary) -->
-    <div class="pcard">
-      <div class="pcard-num">005 — Work</div>
-      <h3 class="pcard-title">Server Monitoring Application</h3>
-      <p class="pcard-desc">
-        Infrastructure monitoring tool using NRPE and SNMP protocols to collect
-        metrics across heterogeneous server environments. Features a custom-built
-        scheduler for polling intervals, threshold alerting, and status aggregation
-        across multiple hosts.
-      </p>
-      <div class="pcard-footer">
-        <div class="tags">
-          <span class="tag">NRPE</span>
-          <span class="tag">SNMP</span>
-          <span class="tag">Custom Scheduler</span>
-          <span class="tag">Infrastructure</span>
-          <span class="tag">Monitoring</span>
-        </div>
-        <span class="prop-badge" title="Proprietary — source code not publicly available">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-          Proprietary
-        </span>
-      </div>
-    </div>
-
-    <div class="pcard">
-      <div class="pcard-num">006 — Work</div>
-      <h3 class="pcard-title">SysAdmin Links Hub</h3>
-      <p class="pcard-desc">
-        A curated, self-managed links hub built for systems administrators.
-        Full CRUD interface for organising commonly used tools, dashboards,
-        and documentation — view, add, remove, and update links in one place,
-        no bookmarks manager required.
-      </p>
-      <div class="pcard-footer">
-        <div class="tags">
-          <span class="tag">CRUD</span>
-          <span class="tag">SysAdmin Tools</span>
-          <span class="tag">Internal Tooling</span>
-          <span class="tag">Dashboard</span>
-        </div>
-        <span class="prop-badge" title="Proprietary — source code not publicly available">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-          Proprietary
-        </span>
-      </div>
-    </div>
-
-    <div class="pcard">
-      <div class="pcard-num">007 — Work</div>
-      <h3 class="pcard-title">Grant Application Platform</h3>
-      <p class="pcard-desc">
-        Multi-role web platform for academic grant management. Professors submit
-        funding requests through a structured form workflow; reviewers evaluate
-        submissions through a dedicated review dashboard; administrators oversee
-        the full pipeline, manage users, and control grant lifecycle state.
-      </p>
-      <div class="pcard-footer">
-        <div class="tags">
-          <span class="tag">Multi-Role Auth</span>
-          <span class="tag">Workflow</span>
-          <span class="tag">Review Dashboard</span>
-          <span class="tag">Admin Panel</span>
-          <span class="tag">Academia</span>
-        </div>
-        <span class="prop-badge" title="Proprietary — source code not publicly available">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-          Proprietary
-        </span>
-      </div>
-    </div>
-
-    <div class="pcard">
-      <div class="pcard-num">008 — Work</div>
-      <h3 class="pcard-title">LDAP CRUD GUI</h3>
-      <p class="pcard-desc">
-        Desktop GUI application for managing an LDAP directory server.
-        Provides a clean interface for creating, reading, updating, and deleting
-        directory entries — removing the need to hand-craft LDIF files or
-        rely on command-line tooling for routine directory operations.
-      </p>
-      <div class="pcard-footer">
-        <div class="tags">
-          <span class="tag">LDAP</span>
-          <span class="tag">GUI</span>
-          <span class="tag">CRUD</span>
-          <span class="tag">Directory Services</span>
-          <span class="tag">Desktop App</span>
-        </div>
-        <span class="prop-badge" title="Proprietary — source code not publicly available">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-          Proprietary
-        </span>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<div class="hr"></div>
-
-<!-- OPEN SOURCE -->
-<section class="sec" id="oss">
-  <div class="sec-label" data-n="02">Contributions</div>
-  <h2 class="sec-title">Open <em>Source</em></h2>
-
-  <div class="oss-block">
-    <div class="oss-body">
-      <h3 class="oss-title">Brave Browser Debloater</h3>
-      <p class="oss-desc">
-        Contributed to an open-source project that strips unnecessary bloat from the Brave browser —
-        reducing telemetry, removing unwanted features, and putting control back in the user's hands.
-        Software should do exactly what you ask and nothing more.
-      </p>
-      <div class="oss-badge">⭐ Open Source Contributor</div>
-    </div>
-    <div class="oss-3d">
-      <canvas id="oss-canvas" style="width:100%;height:100%;display:block;"></canvas>
-    </div>
-  </div>
-
-  <!-- Linux block -->
-  <div style="margin-top:1px;">
-    <div class="pcard lcard" style="border:1px solid var(--border2); background:var(--surface);">
-      <div class="linux-3d">
-        <canvas id="linux-canvas" style="width:100%;height:100%;display:block;"></canvas>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-num">Aspiration</div>
-        <h3 class="pcard-title">Linux Kernel Contributor</h3>
-        <p class="pcard-desc">
-          Linux isn't just an operating system — it's the foundation everything else runs on.
-          I'm studying kernel internals, the driver model, and the patch submission process
-          with the goal of making meaningful contributions.
-          <br><br>
-          The Linux kernel represents the highest form of open-source collaboration:
-          thousands of engineers, one codebase, the discipline to keep it right.
-          That's worth being part of.
-        </p>
-        <div class="tags">
-          <span class="tag tg">Linux Kernel</span>
-          <span class="tag">C</span>
-          <span class="tag">Systems Programming</span>
-          <span class="tag">Driver Development</span>
-          <span class="tag">Open Source</span>
+    <!-- Inverted band: the aspiration, not shipped work -->
+    <div class="band-dark">
+      <div class="shell">
+        <div class="band-inner reveal">
+          <figure class="band-figure">
+            <canvas id="linux-canvas" role="img" aria-label="Diagram of a torus knot circled by kernel modules, with a penguin in the foreground."></canvas>
+          </figure>
+          <div>
+            <p class="label">Aspiration</p>
+            <h3 class="d-lg">Linux Kernel Contributor</h3>
+            <div class="prose">
+              <p>Linux is not just an operating system. It is the foundation everything else runs on. I am studying kernel internals, the driver model, and the patch submission process with the goal of making meaningful contributions.</p>
+              <p>The kernel is the highest form of open-source collaboration: thousands of engineers, one codebase, and the discipline to keep it right. That is worth being part of.</p>
+            </div>
+            <ul class="tags">
+              <li>Linux kernel</li><li>C</li><li>Systems programming</li><li>Driver development</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="hr"></div>
-
-<!-- ABOUT -->
-<section class="sec" id="about">
-  <div class="sec-label" data-n="03">Background</div>
-  <h2 class="sec-title">About <em>me</em></h2>
-  <div class="about-grid">
-    <div class="about-text">
-      <p>I'm a developer with a conviction that the <strong>best software gets out of the way</strong>. No sign-ups, no servers you don't control, no middlemen extracting value from your interactions.</p>
-      <p>Most of what I build lives at the intersection of <strong>peer-to-peer networking</strong>, <strong>edge computing</strong>, and <strong>offline-first design</strong> — where the usual rules don't apply and you have to rethink from the ground up.</p>
-      <p>I'm actively exploring <strong>Rust</strong> and <strong>WebAssembly</strong> as the foundation for a new generation of high-performance, portable software — and working toward contributing to the <strong>Linux kernel</strong>, the largest and most important open-source project in existence.</p>
-      <p>Open source is a <strong>philosophy</strong>. Code should be auditable, improvable, and free from the rent-seeking that dominates modern software.</p>
+  <!-- ABOUT -->
+  <section class="sec" id="about">
+    <div class="shell">
+      <header class="sec-head">
+        <h2 class="d-lg">About <em>me</em></h2>
+      </header>
+      <div class="about">
+        <div class="prose reveal">
+          <p>I'm a developer with a conviction that the <strong>best software gets out of the way</strong>. No sign-ups, no servers you don't control, no middlemen extracting value from your interactions.</p>
+          <p>Most of what I build lives at the intersection of <strong>peer-to-peer networking</strong>, <strong>edge computing</strong>, and <strong>offline-first design</strong>, where the usual rules don't apply and you have to rethink from the ground up.</p>
+          <p>I'm actively exploring <strong>Rust</strong> and <strong>WebAssembly</strong> as the foundation for a new generation of high-performance, portable software, and working toward contributing to the <strong>Linux kernel</strong>, the largest and most important open-source project in existence.</p>
+          <p>Open source is a <strong>philosophy</strong>. Code should be auditable, improvable, and free from the rent-seeking that dominates modern software.</p>
+        </div>
+        <aside class="index-card reveal">
+          <h3 class="d-xs">What I work on</h3>
+          <div class="index-group">
+            <h4>Systems</h4>
+            <ul>
+              <li>Linux kernel internals</li>
+              <li>WebAssembly and Rust</li>
+              <li>Distributed systems</li>
+              <li>Edge computing</li>
+            </ul>
+          </div>
+          <div class="index-group">
+            <h4>Web and product</h4>
+            <ul>
+              <li>P2P technologies and WebRTC</li>
+              <li>No-signup, privacy-first UX</li>
+              <li>Open source everything</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
     </div>
-    <ul class="ilist">
-      <li><span>🔗</span> P2P Technologies & WebRTC</li>
-      <li><span>⚙️</span> WebAssembly & Rust</li>
-      <li><span>🌐</span> Distributed Systems</li>
-      <li><span>🐧</span> Linux Kernel Internals</li>
-      <li><span>🔒</span> No-Signup, Privacy-First UX</li>
-      <li><span>📡</span> Edge Computing</li>
-      <li><span>🛠️</span> Open Source Everything</li>
-    </ul>
-  </div>
-</section>
+  </section>
 
-<div class="hr"></div>
-
-<!-- BLOG -->
-<section class="sec" id="blog">
-  <div class="sec-label" data-n="04">Writing</div>
-  <h2 class="sec-title">The <em>Blog</em></h2>
-  <div class="blog-box">
-    <div>
-      <h3 class="blog-title">Thinking out loud, in public</h3>
-      <p class="blog-sub">
-        I write about what I'm building, the problems I'm running into, and the architecture decisions I'm wrestling with —
-        fault-tolerant P2P meshes, CRDT-based sync, Rust/WASM interop, edge deployment patterns,
-        Linux kernel internals, and more. No tutorials you've seen before.
-      </p>
-      <a href="https://blog.alkhafaji.dev" class="btn" style="margin-top:1.5rem;">Read the Blog →</a>
+  <!-- BLOG -->
+  <section class="sec" id="blog">
+    <div class="shell">
+      <header class="sec-head">
+        <h2 class="d-lg">The <em>Blog</em></h2>
+      </header>
+      <div class="blog-box reveal">
+        <div>
+          <h3 class="d-md">Thinking out loud, in public</h3>
+          <div class="prose">
+            <p>I write about what I'm building, the problems I run into, and the architecture decisions I'm wrestling with: fault-tolerant P2P meshes, CRDT-based sync, Rust and WASM interop, edge deployment patterns, and Linux kernel internals. No tutorials you've seen before.</p>
+          </div>
+        </div>
+        <a class="btn btn-primary" href="https://blog.alkhafaji.dev">Read the blog</a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+
+</main>
 
 <footer>
-  <div class="footer-copy">Abdullah Al Khafaji — Building for the open web</div>
-  <ul class="footer-links">
-    <li><a href="https://github.com/BraveOPotato">GitHub</a></li>
-    <li><a href="https://blog.alkhafaji.dev">Blog</a></li>
-    <li><a href="https://abdullah@alkhafaji.dev">Email</a></li>
-  </ul>
+  <div class="shell">
+    <div class="foot-top">
+      <p class="foot-mark">Abdullah Al Khafaji</p>
+      <ul class="foot-links">
+        <li><a href="https://github.com/BraveOPotato" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://blog.alkhafaji.dev">Blog</a></li>
+        <li><a href="mailto:abdullah@alkhafaji.dev">Email</a></li>
+      </ul>
+    </div>
+    <p class="foot-base">Building for the open web.</p>
+  </div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ── HERO BACKGROUND: drifting particles ──────────────────────────────────────
-(function() {
-  const canvas = document.getElementById('hero-canvas');
-  if (!canvas) return;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
-  renderer.setClearColor(0x000000, 0);
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, 2, 0.1, 200);
-  camera.position.z = 50;
+/* ══ MOBILE NAV ═══════════════════════════════════════════════════════════ */
+(function () {
+  var btn = document.getElementById('menu-btn');
+  var list = document.getElementById('nav-links');
+  if (!btn || !list) return;
+  btn.addEventListener('click', function () {
+    var open = list.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  list.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      list.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+})();
 
-  const N = 700;
-  const geo = new THREE.BufferGeometry();
-  const pos = new Float32Array(N * 3);
-  const vel = new Float32Array(N * 2);
-  for (let i = 0; i < N; i++) {
-    pos[i*3]   = (Math.random()-0.5)*130;
-    pos[i*3+1] = (Math.random()-0.5)*90;
-    pos[i*3+2] = (Math.random()-0.5)*60;
-    vel[i*2]   = (Math.random()-0.5)*0.005;
-    vel[i*2+1] = (Math.random()-0.5)*0.003;
-  }
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x22243a, size: 0.5, transparent: true, opacity: 0.7 })));
+/* ══ THEME PLUMBING ═══════════════════════════════════════════════════════
+   The diagrams are line art, so they have to invert with the page. Every
+   themed material registers a role here; a theme change re-reads the CSS
+   viz tokens and recolours in place.                                     */
+var themedMats = [];
+var themeHooks = [];
+
+function tinted(mat, role) { themedMats.push({ mat: mat, role: role }); return mat; }
+
+function vizPalette() {
+  var s = getComputedStyle(document.documentElement);
+  return {
+    node:  s.getPropertyValue('--viz-node').trim(),
+    line:  s.getPropertyValue('--viz-line').trim(),
+    shell: s.getPropertyValue('--viz-shell').trim(),
+    fill:  s.getPropertyValue('--viz-fill').trim(),
+    band:  s.getPropertyValue('--viz-band').trim()
+  };
+}
+
+function repaintScenes() {
+  var p = vizPalette();
+  themedMats.forEach(function (t) { if (p[t.role]) t.mat.color.set(p[t.role]); });
+  // Animated scenes repaint on the next frame anyway; this is what makes the
+  // toggle work when motion is reduced and only one frame was ever drawn.
+  themeHooks.forEach(function (fn) { fn(); });
+}
+
+/* ══ SCENE DRIVER ═════════════════════════════════════════════════════════
+   Shared plumbing for the editorial line-art diagrams. Each scene only
+   renders while it is on screen, and collapses to a single static frame
+   under prefers-reduced-motion.                                          */
+var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function makeRenderer(canvas) {
+  var r = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  r.setClearColor(0x000000, 0);
+  return r;
+}
+
+function drive(canvas, renderer, camera, step) {
+  var t = 0;
+  // Redraw the current frame after a theme change, whatever the motion mode.
+  themeHooks.push(function () { step(t); });
 
   function resize() {
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
+    var w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(w, h, false);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   }
-  resize();
   window.addEventListener('resize', resize);
+  resize();
+
+  if (REDUCE) {
+    step(0);
+    // Re-render once fonts and layout have settled, so the static frame is sized right.
+    setTimeout(function () { resize(); step(0); }, 300);
+    return;
+  }
+
+  var visible = true;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+    }, { threshold: 0 }).observe(canvas);
+  }
 
   (function tick() {
     requestAnimationFrame(tick);
-    const p = geo.attributes.position.array;
-    for (let i = 0; i < N; i++) {
-      p[i*3]   += vel[i*2];
-      p[i*3+1] += vel[i*2+1];
-      if (p[i*3] > 65) p[i*3] = -65;
-      if (p[i*3] < -65) p[i*3] = 65;
-      if (p[i*3+1] > 45) p[i*3+1] = -45;
-      if (p[i*3+1] < -45) p[i*3+1] = 45;
-    }
-    geo.attributes.position.needsUpdate = true;
-    renderer.render(scene, camera);
+    if (!visible) return;
+    t += 1;
+    step(t);
   })();
-})();
+  setTimeout(resize, 300);
+}
 
-// ── HERO RIGHT: P2P sphere network ───────────────────────────────────────────
-(function() {
-  const canvas = document.getElementById('p2p-canvas');
-  if (!canvas) return;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setClearColor(0x000000, 0);
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+/* ══ HERO: peer-to-peer mesh ══════════════════════════════════════════════ */
+(function () {
+  var canvas = document.getElementById('p2p-canvas');
+  if (!canvas || !window.THREE) return;
+  var renderer = makeRenderer(canvas);
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
   camera.position.z = 14;
 
-  const group = new THREE.Group();
-  const N = 40, R = 4.6;
-  const nodes = [];
-  const phi = Math.PI * (3 - Math.sqrt(5));
+  var group = new THREE.Group();
+  var N = 40, R = 4.6, nodes = [];
+  var phi = Math.PI * (3 - Math.sqrt(5));
 
-  for (let i = 0; i < N; i++) {
-    const y = 1 - (i / (N - 1)) * 2;
-    const r2 = Math.sqrt(Math.max(0, 1 - y*y));
-    const theta = phi * i;
-    const pos = new THREE.Vector3(Math.cos(theta)*r2*R, y*R, Math.sin(theta)*r2*R);
-    const isHub = i % 8 === 0;
+  // Shared per-role materials: one recolour reaches every node.
+  var hubMat = tinted(new THREE.MeshBasicMaterial({ color: 0x000000 }), 'node');
+  var nodeMat = tinted(new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.7 }), 'node');
+  var ringMat = tinted(new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, side: THREE.DoubleSide }), 'node');
 
-    const g = new THREE.SphereGeometry(isHub ? 0.2 : 0.1, 8, 8);
-    const m = new THREE.MeshBasicMaterial({ color: isHub ? 0xe05a2b : 0x4f8ef7, transparent: true, opacity: isHub ? 1 : 0.75 });
-    const mesh = new THREE.Mesh(g, m);
+  for (var i = 0; i < N; i++) {
+    var y = 1 - (i / (N - 1)) * 2;
+    var r2 = Math.sqrt(Math.max(0, 1 - y * y));
+    var theta = phi * i;
+    var pos = new THREE.Vector3(Math.cos(theta) * r2 * R, y * R, Math.sin(theta) * r2 * R);
+    var isHub = i % 8 === 0;
+
+    var mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(isHub ? 0.2 : 0.095, 10, 10),
+      isHub ? hubMat : nodeMat
+    );
     mesh.position.copy(pos);
     group.add(mesh);
 
     if (isHub) {
-      const rg = new THREE.RingGeometry(0.25, 0.38, 18);
-      const rm = new THREE.MeshBasicMaterial({ color: 0xe05a2b, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
-      const ring = new THREE.Mesh(rg, rm);
+      var ring = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.31, 24), ringMat);
       ring.position.copy(pos);
       group.add(ring);
     }
     nodes.push(pos);
   }
 
-  const lm = new THREE.LineBasicMaterial({ color: 0x22243a, transparent: true, opacity: 0.45 });
-  for (let i = 0; i < N; i++) {
-    const sorted = nodes.map((n,j) => ({ j, d: nodes[i].distanceTo(n) }))
-      .filter(x => x.j !== i).sort((a,b) => a.d-b.d).slice(0, 3);
-    sorted.forEach(({ j }) => {
-      if (j > i) {
-        const g = new THREE.BufferGeometry().setFromPoints([nodes[i], nodes[j]]);
-        group.add(new THREE.Line(g, lm));
-      }
-    });
+  var lineMat = tinted(new THREE.LineBasicMaterial({ color: 0x757575, transparent: true, opacity: 0.5 }), 'line');
+  for (var a = 0; a < N; a++) {
+    nodes.map(function (n, j) { return { j: j, d: nodes[a].distanceTo(n) }; })
+      .filter(function (x) { return x.j !== a; })
+      .sort(function (p, q) { return p.d - q.d; })
+      .slice(0, 3)
+      .forEach(function (x) {
+        if (x.j > a) {
+          group.add(new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([nodes[a], nodes[x.j]]), lineMat
+          ));
+        }
+      });
   }
 
-  const swg = new THREE.SphereGeometry(R+0.4, 24, 16);
-  const swm = new THREE.MeshBasicMaterial({ color: 0x181925, wireframe: true, transparent: true, opacity: 0.08 });
-  group.add(new THREE.Mesh(swg, swm));
+  group.add(new THREE.Mesh(
+    new THREE.SphereGeometry(R + 0.4, 28, 18),
+    tinted(new THREE.MeshBasicMaterial({ color: 0xe0e0e0, wireframe: true, transparent: true, opacity: 0.55 }), 'shell')
+  ));
   scene.add(group);
 
-  let mouse = { x: 0, y: 0 };
-  document.addEventListener('mousemove', e => {
-    mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
-    mouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
-  });
-
-  function resize() {
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  let t = 0;
-  (function tick() {
-    requestAnimationFrame(tick);
-    t += 0.004;
-    group.rotation.y = t + mouse.x * 0.25;
-    group.rotation.x = Math.sin(t*0.3)*0.12 + mouse.y * 0.12;
+  drive(canvas, renderer, camera, function (f) {
+    var t = f * 0.0035;
+    group.rotation.y = t;
+    group.rotation.x = Math.sin(t * 0.3) * 0.12;
     renderer.render(scene, camera);
-  })();
+  });
 })();
 
-// ── FEATURED PROJECT: P2P detail with data packets ───────────────────────────
-(function() {
-  const canvas = document.getElementById('p2p-detail-canvas');
-  if (!canvas) return;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setClearColor(0x000000, 0);
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
-  camera.position.z = 9;
+/* ══ FEATURE: packets in flight ═══════════════════════════════════════════ */
+(function () {
+  var canvas = document.getElementById('p2p-detail-canvas');
+  if (!canvas || !window.THREE) return;
+  var renderer = makeRenderer(canvas);
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+  camera.position.z = 7.2;
 
-  const group = new THREE.Group();
-  const pts = [];
+  var group = new THREE.Group();
+  var pts = [];
 
-  for (let i = 0; i < 20; i++) {
-    const theta = Math.random() * Math.PI * 2;
-    const phi2 = Math.acos(2*Math.random()-1);
-    const R = 2.6 + Math.random()*0.4;
-    const pos = new THREE.Vector3(
-      R*Math.sin(phi2)*Math.cos(theta),
-      R*Math.sin(phi2)*Math.sin(theta),
-      R*Math.cos(phi2)
+  var mainMat = tinted(new THREE.MeshBasicMaterial({ color: 0x000000 }), 'node');
+  var minorMat = tinted(new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.55 }), 'node');
+
+  for (var i = 0; i < 20; i++) {
+    var theta = Math.random() * Math.PI * 2;
+    var ph = Math.acos(2 * Math.random() - 1);
+    var R = 2.6 + Math.random() * 0.4;
+    var pos = new THREE.Vector3(
+      R * Math.sin(ph) * Math.cos(theta),
+      R * Math.sin(ph) * Math.sin(theta),
+      R * Math.cos(ph)
     );
     pts.push(pos);
-    const isMain = i < 5;
-    const g = new THREE.SphereGeometry(isMain ? 0.22 : 0.12, 8, 8);
-    const m = new THREE.MeshBasicMaterial({ color: isMain ? 0xe05a2b : 0x4f8ef7 });
-    const mesh = new THREE.Mesh(g, m);
+    var isMain = i < 5;
+    var mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(isMain ? 0.2 : 0.11, 10, 10),
+      isMain ? mainMat : minorMat
+    );
     mesh.position.copy(pos);
     group.add(mesh);
   }
 
-  const packets = [];
-  const lm = new THREE.LineBasicMaterial({ color: 0x22243a, transparent: true, opacity: 0.4 });
-  for (let i = 0; i < pts.length; i++) {
-    const nearest = pts.map((p,j) => ({ j, d: pts[i].distanceTo(p) }))
-      .filter(x => x.j !== i).sort((a,b) => a.d-b.d).slice(0, 2);
-    nearest.forEach(({ j }) => {
-      if (j > i) {
-        group.add(new THREE.Line(
-          new THREE.BufferGeometry().setFromPoints([pts[i], pts[j]]), lm
-        ));
-        const pg = new THREE.SphereGeometry(0.07, 6, 6);
-        const pm = new THREE.MeshBasicMaterial({ color: 0x39d353, transparent: true, opacity: 0.9 });
-        const p = new THREE.Mesh(pg, pm);
-        group.add(p);
-        packets.push({ mesh: p, a: pts[i], b: pts[j], t: Math.random() });
-      }
-    });
+  var packets = [];
+  var lineMat = tinted(new THREE.LineBasicMaterial({ color: 0x9e9e9e, transparent: true, opacity: 0.55 }), 'line');
+  for (var a = 0; a < pts.length; a++) {
+    (function (a) {
+      pts.map(function (p, j) { return { j: j, d: pts[a].distanceTo(p) }; })
+        .filter(function (x) { return x.j !== a; })
+        .sort(function (p, q) { return p.d - q.d; })
+        .slice(0, 2)
+        .forEach(function (x) {
+          if (x.j > a) {
+            group.add(new THREE.Line(
+              new THREE.BufferGeometry().setFromPoints([pts[a], pts[x.j]]), lineMat
+            ));
+            // Each packet fades on its own cycle, so it needs its own material.
+            var packet = new THREE.Mesh(
+              new THREE.SphereGeometry(0.075, 8, 8),
+              tinted(new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.9 }), 'node')
+            );
+            group.add(packet);
+            packets.push({ mesh: packet, a: pts[a], b: pts[x.j], t: Math.random() });
+          }
+        });
+    })(a);
   }
   scene.add(group);
 
-  function resize() {
-    const w = canvas.offsetWidth||360, h = canvas.offsetHeight||260;
-    renderer.setSize(w, h, false);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    camera.aspect = w/h; camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  let t = 0;
-  (function tick() {
-    requestAnimationFrame(tick);
-    t += 0.006;
+  drive(canvas, renderer, camera, function (f) {
+    var t = f * 0.006;
     group.rotation.y = t * 0.65;
-    group.rotation.x = Math.sin(t*0.35) * 0.2;
-    packets.forEach(p => {
+    group.rotation.x = Math.sin(t * 0.35) * 0.2;
+    packets.forEach(function (p) {
       p.t = (p.t + 0.008) % 1;
       p.mesh.position.lerpVectors(p.a, p.b, p.t);
       p.mesh.material.opacity = Math.sin(p.t * Math.PI) * 0.9;
     });
     renderer.render(scene, camera);
-  })();
+  });
 })();
 
-// ── OSS CARD: icosahedron + orbiting rings ────────────────────────────────────
-(function() {
-  const canvas = document.getElementById('oss-canvas');
-  if (!canvas) return;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setClearColor(0x000000, 0);
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+/* ══ OPEN SOURCE: polyhedron and orbits ═══════════════════════════════════ */
+(function () {
+  var canvas = document.getElementById('oss-canvas');
+  if (!canvas || !window.THREE) return;
+  var renderer = makeRenderer(canvas);
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
   camera.position.z = 5.5;
 
-  const group = new THREE.Group();
+  var group = new THREE.Group();
 
-  const ico = new THREE.Mesh(
+  group.add(new THREE.Mesh(
     new THREE.IcosahedronGeometry(1.6, 0),
-    new THREE.MeshBasicMaterial({ color: 0x4f8ef7, wireframe: true, transparent: true, opacity: 0.3 })
-  );
-  group.add(ico);
+    tinted(new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, transparent: true, opacity: 0.75 }), 'node')
+  ));
+  // Solid fill occludes the back faces so the wireframe reads as line art.
+  // It has to track the figure's surface colour, not the ink colour.
   group.add(new THREE.Mesh(
     new THREE.IcosahedronGeometry(1.55, 0),
-    new THREE.MeshBasicMaterial({ color: 0x07080d, transparent: true, opacity: 0.92 })
+    tinted(new THREE.MeshBasicMaterial({ color: 0xf5f5f5 }), 'fill')
   ));
 
-  const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.42, 16, 16),
-    new THREE.MeshBasicMaterial({ color: 0x4f8ef7, transparent: true, opacity: 0.65 })
+  var core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.42, 18, 18),
+    tinted(new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.65 }), 'node')
   );
   group.add(core);
 
-  [[0xe05a2b, 0.85, 0, 0.5], [0x4f8ef7, 1.15, 0.8, 0.9], [0x39d353, 1.4, 1.5, 0.6]].forEach(([c,r,ry,op]) => {
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(r, 0.016, 8, 48),
-      new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: op })
+  [[0.85, 0, 0.85], [1.15, 0.8, 0.5], [1.4, 1.5, 0.3]].forEach(function (cfg) {
+    var ring = new THREE.Mesh(
+      new THREE.TorusGeometry(cfg[0], 0.013, 8, 64),
+      tinted(new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: cfg[2] }), 'node')
     );
-    ring.rotation.x = Math.PI/2;
-    ring.rotation.y = ry;
+    ring.rotation.x = Math.PI / 2;
+    ring.rotation.y = cfg[1];
     group.add(ring);
   });
-
   scene.add(group);
 
-  function resize() {
-    const w = canvas.offsetWidth||340, h = canvas.offsetHeight||220;
-    renderer.setSize(w, h, false);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    camera.aspect = w/h; camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  let t = 0;
-  (function tick() {
-    requestAnimationFrame(tick);
-    t += 0.009;
+  drive(canvas, renderer, camera, function (f) {
+    var t = f * 0.008;
     group.rotation.y = t;
-    group.rotation.x = Math.sin(t*0.4)*0.3;
-    core.material.opacity = 0.4 + Math.sin(t*2)*0.25;
+    group.rotation.x = Math.sin(t * 0.4) * 0.3;
+    core.material.opacity = 0.45 + Math.sin(t * 2) * 0.2;
     renderer.render(scene, camera);
-  })();
+  });
 })();
 
-// ── LINUX CARD: torus knot + kernel modules + Tux ────────────────────────────
-(function() {
-  const canvas = document.getElementById('linux-canvas');
-  if (!canvas) return;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setClearColor(0x000000, 0);
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-  camera.position.set(0, 1, 11);
+/* ══ LINUX BAND: kernel knot and Tux (inverted, white on black) ═══════════ */
+(function () {
+  var canvas = document.getElementById('linux-canvas');
+  if (!canvas || !window.THREE) return;
+  var renderer = makeRenderer(canvas);
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 1, 8.2);
   camera.lookAt(0, 0, 0);
 
-  // ── spinning group (torus knot + modules) ──
-  const spinGroup = new THREE.Group();
+  var spin = new THREE.Group();
 
-  // Torus knot wireframe
-  const tk = new THREE.Mesh(
-    new THREE.TorusKnotGeometry(1.4, 0.22, 120, 14, 2, 3),
-    new THREE.MeshBasicMaterial({ color: 0x39d353, wireframe: true, transparent: true, opacity: 0.45 })
+  var knot = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(1.4, 0.22, 90, 10, 2, 3),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.6 })
   );
-  spinGroup.add(tk);
+  spin.add(knot);
+  // The band stays dark in both themes, so Tux and the knot keep their white
+  // line art. Only the back-face occluder has to follow the band surface.
+  spin.add(new THREE.Mesh(
+    new THREE.TorusKnotGeometry(1.4, 0.19, 90, 10, 2, 3),
+    tinted(new THREE.MeshBasicMaterial({ color: 0x000000 }), 'band')
+  ));
 
-  // Solid fill to occlude back-faces nicely
-  const tkSolid = new THREE.Mesh(
-    new THREE.TorusKnotGeometry(1.4, 0.19, 120, 14, 2, 3),
-    new THREE.MeshBasicMaterial({ color: 0x07080d })
-  );
-  spinGroup.add(tkSolid);
-
-  // Orbiting module cubes
-  const modMeshes = [];
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2;
-    const mod = new THREE.Mesh(
+  var mods = [];
+  for (var i = 0; i < 8; i++) {
+    var angle = (i / 8) * Math.PI * 2;
+    var mod = new THREE.Mesh(
       new THREE.BoxGeometry(0.18, 0.18, 0.18),
-      new THREE.MeshBasicMaterial({ color: 0x39d353, transparent: true, opacity: 0.75 })
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 })
     );
     mod.position.set(Math.cos(angle) * 2.6, (i % 2 === 0 ? 0.4 : -0.4), Math.sin(angle) * 2.6);
-    spinGroup.add(mod);
-    modMeshes.push({ mesh: mod, baseAngle: angle });
+    spin.add(mod);
+    mods.push(mod);
   }
 
-  // Lines from centre to each module
-  const lm = new THREE.LineBasicMaterial({ color: 0x22243a, transparent: true, opacity: 0.5 });
-  modMeshes.forEach(({ mesh }) => {
-    const lg = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0, 0, 0),
-      mesh.position.clone()
-    ]);
-    spinGroup.add(new THREE.Line(lg, lm));
+  var lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.28 });
+  mods.forEach(function (m) {
+    spin.add(new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), m.position.clone()]),
+      lineMat
+    ));
   });
+  scene.add(spin);
 
-  scene.add(spinGroup);
-
-  // ── static Tux (always faces camera) ──
-  const tux = new THREE.Group();
-
-  // Body
-  const body = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.28, 0.36, 0.72, 14),
-    new THREE.MeshBasicMaterial({ color: 0x1a1b28 })
-  );
-  tux.add(body);
-
-  // Belly patch
-  const belly = new THREE.Mesh(
-    new THREE.SphereGeometry(0.2, 12, 12),
-    new THREE.MeshBasicMaterial({ color: 0x2e3050 })
+  // Tux, rendered as a monochrome cut-out so he reads on the black band.
+  var tux = new THREE.Group();
+  tux.add(new THREE.Mesh(
+    new THREE.CylinderGeometry(0.28, 0.36, 0.72, 16),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  ));
+  var belly = new THREE.Mesh(
+    new THREE.SphereGeometry(0.2, 14, 14),
+    new THREE.MeshBasicMaterial({ color: 0xe0e0e0 })
   );
   belly.position.set(0, 0.04, 0.21);
   belly.scale.set(1, 1.25, 0.5);
   tux.add(belly);
 
-  // Head
-  const head = new THREE.Mesh(
-    new THREE.SphereGeometry(0.23, 14, 14),
-    new THREE.MeshBasicMaterial({ color: 0x1a1b28 })
+  var head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.23, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
   );
   head.position.set(0, 0.54, 0);
   tux.add(head);
 
-  // Eyes
-  [-0.09, 0.09].forEach(xo => {
-    const eye = new THREE.Mesh(
-      new THREE.SphereGeometry(0.04, 8, 8),
-      new THREE.MeshBasicMaterial({ color: 0x39d353 })
+  [-0.09, 0.09].forEach(function (xo) {
+    var eye = new THREE.Mesh(
+      new THREE.SphereGeometry(0.042, 10, 10),
+      new THREE.MeshBasicMaterial({ color: 0x000000 })
     );
     eye.position.set(xo, 0.59, 0.19);
     tux.add(eye);
   });
 
-  // Beak (cone pointing forward)
-  const beak = new THREE.Mesh(
-    new THREE.ConeGeometry(0.06, 0.11, 6),
-    new THREE.MeshBasicMaterial({ color: 0xe05a2b })
+  var beak = new THREE.Mesh(
+    new THREE.ConeGeometry(0.06, 0.11, 8),
+    new THREE.MeshBasicMaterial({ color: 0x9e9e9e })
   );
   beak.rotation.x = Math.PI / 2;
   beak.position.set(0, 0.51, 0.29);
   tux.add(beak);
 
-  // Feet
-  [-0.13, 0.13].forEach(xo => {
-    const foot = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.045, 0.085, 0.07, 8),
-      new THREE.MeshBasicMaterial({ color: 0xe05a2b })
+  [-0.13, 0.13].forEach(function (xo) {
+    var foot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.045, 0.085, 0.07, 10),
+      new THREE.MeshBasicMaterial({ color: 0x9e9e9e })
     );
     foot.position.set(xo, -0.41, 0.05);
     tux.add(foot);
   });
 
-  tux.position.set(0, -0.15, 0);
+  // Sits in front of the knot at 1.6x so he reads at figure size, not as a speck.
+  tux.position.set(0, -0.75, 2.0);
+  tux.scale.setScalar(1.6);
   scene.add(tux);
 
-  // ── resize handler ──
-  function resize() {
-    const w = canvas.parentElement ? canvas.parentElement.offsetWidth : 360;
-    const h = canvas.parentElement ? canvas.parentElement.offsetHeight : 260;
-    const W = w || 360, H = h || 260;
-    renderer.setSize(W, H, false);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    camera.aspect = W / H;
-    camera.updateProjectionMatrix();
-  }
-  // Delay first resize until layout is painted
-  setTimeout(resize, 50);
-  window.addEventListener('resize', resize);
-
-  let t = 0;
-  (function tick() {
-    requestAnimationFrame(tick);
-    t += 0.005;
-    spinGroup.rotation.y = t * 0.55;
-    tk.rotation.z = t * 0.22;
-    // Tux stays fixed, facing the camera
+  drive(canvas, renderer, camera, function (f) {
+    var t = f * 0.005;
+    spin.rotation.y = t * 0.55;
+    knot.rotation.z = t * 0.22;
     renderer.render(scene, camera);
-  })();
+  });
 })();
 
-// ── SCROLL FADE-IN ─────────────────────────────────────────────────────────
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.style.opacity = '1';
-      e.target.style.transform = 'translateY(0)';
-    }
-  });
-}, { threshold: 0.07 });
+/* ══ THEME TOGGLE ═════════════════════════════════════════════════════════
+   Three states: no stored choice follows the system, an explicit choice
+   persists and wins in either direction. The button always names the mode
+   it will switch you to.                                                 */
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-btn');
+  var label = document.getElementById('theme-label');
+  var meta = document.getElementById('theme-color');
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  if (!btn) return;
 
-document.querySelectorAll('.pcard, .oss-block, .blog-box').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(22px)';
-  el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-  io.observe(el);
-});
+  function stored() {
+    try { return localStorage.getItem('theme'); } catch (e) { return null; }
+  }
+  function effective() {
+    var s = stored();
+    return (s === 'light' || s === 'dark') ? s : (mq.matches ? 'dark' : 'light');
+  }
+  function sync() {
+    var dark = effective() === 'dark';
+    label.textContent = dark ? 'Light' : 'Dark';
+    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    if (meta) meta.setAttribute('content', dark ? '#0d0d0d' : '#ffffff');
+    repaintScenes();
+  }
+
+  btn.addEventListener('click', function () {
+    var next = effective() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+    sync();
+  });
+
+  // Follow the system only while the reader has not chosen for themselves.
+  var onSystemChange = function () { if (!stored()) sync(); };
+  if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+  else if (mq.addListener) mq.addListener(onSystemChange);
+
+  sync();
+})();
+
+/* ══ SCROLL REVEAL ════════════════════════════════════════════════════════
+   Entry cue only: it establishes reading order down the page. Skipped
+   entirely under reduced motion, where every element is already visible. */
+(function () {
+  if (REDUCE || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+})();
 </script>
 </body>
 </html>
